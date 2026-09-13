@@ -16,6 +16,8 @@ import {
   posterUrl,
 } from "@/lib/i18n";
 import { FlagKR, FlagUS, FlagJP } from "@/components/Flags";
+import StarRating from "@/components/StarRating";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const LANG_FLAG_ICON: Record<Lang, React.ComponentType<{ size?: number }>> = {
   ko: FlagKR,
@@ -61,15 +63,27 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
   const [selected, setSelected] = useState<Movie | null>(null);
+  const [isAdminView, setIsAdminView] = useState(false);
 
   const t = I18N[lang];
 
-  useEffect(() => {
-    fetch("/api/movies")
+  function refreshMovies() {
+    return fetch("/api/movies")
       .then((r) => r.json())
-      .then((data) => setItems(data.items || []))
-      .finally(() => setLoading(false));
+      .then((data) => setItems(data.items || []));
+  }
+
+  useEffect(() => {
+    refreshMovies().finally(() => setLoading(false));
+    fetch("/api/admin/session")
+      .then((r) => r.json())
+      .then((d) => setIsAdminView(!!d.isAdmin));
   }, []);
+
+  async function adminLogout() {
+    await fetch("/api/admin/logout", { method: "POST" });
+    setIsAdminView(false);
+  }
 
   useEffect(() => {
     let saved: string | null = null;
@@ -165,9 +179,15 @@ export default function Home() {
             <button className="theme-toggle" aria-label="theme" onClick={toggleTheme}>
               <SunMoonIcon dark={theme === "dark"} />
             </button>
-            <Link href="/admin" className="admin-link">
-              {t.adminLink}
-            </Link>
+            {isAdminView ? (
+              <button className="admin-link" onClick={adminLogout} type="button">
+                로그아웃
+              </button>
+            ) : (
+              <Link href="/admin" className="admin-link">
+                {t.adminLink}
+              </Link>
+            )}
           </div>
           <div className="hero-stats">
             <div className="stat">
@@ -269,7 +289,16 @@ export default function Home() {
       </div>
 
       {selected && (
-        <MovieModal item={selected} lang={lang} t={t} onClose={() => setSelected(null)} />
+        <MovieModal
+          item={selected}
+          lang={lang}
+          t={t}
+          isAdmin={isAdminView}
+          onClose={() => setSelected(null)}
+          onChanged={async () => {
+            await refreshMovies();
+          }}
+        />
       )}
     </>
   );
@@ -333,18 +362,60 @@ function MovieModal({
   item,
   lang,
   t,
+  isAdmin,
   onClose,
+  onChanged,
 }: {
   item: Movie;
   lang: Lang;
   t: (typeof I18N)["ko"];
+  isAdmin: boolean;
   onClose: () => void;
+  onChanged: () => Promise<void>;
 }) {
   const title = getTitle(item, lang);
   const showSub = item.titleKr && title !== item.titleKr;
   const src = posterUrl(item.posterKey?.[lang] || item.posterKey?.ko, "w342");
   const grade = item.grade ? parseFloat(String(item.grade)).toFixed(1) : "—";
   const vote = item.voteAverage ? parseFloat(String(item.voteAverage)).toFixed(1) : "—";
+
+  const [editGrade, setEditGrade] = useState<number | null>(item.grade == null ? null : Number(item.grade));
+  const [editComment, setEditComment] = useState(item.comment || "");
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function saveEdit() {
+    setSaving(true);
+    try {
+      await fetch("/api/admin/edit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: item.id, grade: editGrade, comment: editComment }),
+      });
+      await onChanged();
+      onClose();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  async function deleteMovie() {
+    setDeleting(true);
+    try {
+      await fetch("/api/admin/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: item.id }),
+      });
+      await onChanged();
+      onClose();
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -406,8 +477,41 @@ function MovieModal({
             <span className="label">{t.castLabel}</span>
             <span>{getCasting(item, lang) || t.noInfo}</span>
           </div>
+
+          {isAdmin && (
+            <div className="modal-admin">
+              <div className="modal-admin-label">관리자</div>
+              <StarRating value={editGrade} onChange={setEditGrade} size={22} />
+              <div className="field" style={{ marginTop: 10, marginBottom: 0 }}>
+                <input
+                  type="text"
+                  value={editComment}
+                  onChange={(e) => setEditComment(e.target.value)}
+                  placeholder="한줄평…"
+                  maxLength={200}
+                />
+              </div>
+              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                <button className="btn" type="button" onClick={saveEdit} disabled={saving}>
+                  {saving ? "저장 중…" : "저장"}
+                </button>
+                <button className="btn danger" type="button" onClick={() => setConfirmDelete(true)} disabled={deleting}>
+                  {deleting ? "삭제 중…" : "삭제"}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+      {confirmDelete && (
+        <ConfirmDialog
+          message={`"${item.titleKr}"을(를) 삭제하시겠습니까? 되돌릴 수 없습니다.`}
+          confirmLabel="삭제"
+          danger
+          onConfirm={deleteMovie}
+          onCancel={() => setConfirmDelete(false)}
+        />
+      )}
     </div>
   );
 }

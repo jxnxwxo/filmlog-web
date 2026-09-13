@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import StarRating from "@/components/StarRating";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { Movie, getTitle } from "@/lib/i18n";
 
 interface SearchCandidate {
@@ -136,8 +137,30 @@ function AddMovieForm() {
     }
   }
 
+  const [confirmText, setConfirmText] = useState<string | null>(null);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!selected) return;
+    setSubmitting(true);
+    setMessage(null);
+    try {
+      const checkRes = await fetch(
+        `/api/admin/check?tmdbId=${selected.id}&mediaType=${selected.mediaType}`
+      );
+      const checkData = await checkRes.json();
+      if (checkData.exists) {
+        setConfirmText(`이미 존재하는 작품입니다 (${checkData.titles.join(", ")}). 그래도 추가하시겠습니까?`);
+        setSubmitting(false);
+        return;
+      }
+      await doAdd();
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function doAdd() {
     if (!selected) return;
     setSubmitting(true);
     setMessage(null);
@@ -155,10 +178,7 @@ function AddMovieForm() {
       });
       const data = await res.json();
       if (res.ok) {
-        const note = data.alreadyLogged
-          ? ` (참고: 같은 작품이 이미 있어요 — ${data.alreadyLogged.join(", ")})`
-          : "";
-        setMessage({ type: "success", text: `"${data.title}" 추가 완료!${note}` });
+        setMessage({ type: "success", text: `"${data.title}" 추가 완료!` });
         setSelected(null);
         setResults([]);
         setQuery("");
@@ -169,6 +189,7 @@ function AddMovieForm() {
       }
     } finally {
       setSubmitting(false);
+      setConfirmText(null);
     }
   }
 
@@ -253,6 +274,15 @@ function AddMovieForm() {
 
       {message && message.type === "success" && selected === null && (
         <div className="msg success">{message.text}</div>
+      )}
+
+      {confirmText && (
+        <ConfirmDialog
+          message={confirmText}
+          confirmLabel="추가"
+          onConfirm={doAdd}
+          onCancel={() => setConfirmText(null)}
+        />
       )}
     </>
   );
