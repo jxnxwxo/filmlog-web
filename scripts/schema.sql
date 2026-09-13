@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS movies (
   overview JSONB,
   vote_average NUMERIC,
   poster_key JSONB,
+  comment TEXT,
   category TEXT NOT NULL DEFAULT 'movie',
   tmdb_id INTEGER,
   media_type TEXT,

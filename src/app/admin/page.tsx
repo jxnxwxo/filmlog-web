@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import StarRating from "@/components/StarRating";
+import { Movie, getTitle } from "@/lib/i18n";
 
 interface SearchCandidate {
   id: number;
@@ -83,6 +85,14 @@ export default function AdminPage() {
           </>
         )}
       </div>
+
+      {isAdmin && (
+        <div className="admin-card" style={{ marginTop: 24 }}>
+          <h1 style={{ fontSize: 20 }}>기존 작품 수정</h1>
+          <p className="sub">평점과 한줄평을 고칠 수 있어요.</p>
+          <EditMovieSection />
+        </div>
+      )}
     </div>
   );
 }
@@ -92,7 +102,8 @@ function AddMovieForm() {
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<SearchCandidate[]>([]);
   const [selected, setSelected] = useState<SearchCandidate | null>(null);
-  const [grade, setGrade] = useState("");
+  const [grade, setGrade] = useState<number | null>(null);
+  const [comment, setComment] = useState("");
   const [category, setCategory] = useState<"movie" | "drama">("movie");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
@@ -128,7 +139,8 @@ function AddMovieForm() {
         body: JSON.stringify({
           tmdbId: selected.id,
           mediaType: selected.mediaType,
-          grade: grade === "" ? null : Number(grade),
+          grade,
+          comment,
           category,
         }),
       });
@@ -141,7 +153,8 @@ function AddMovieForm() {
         setSelected(null);
         setResults([]);
         setQuery("");
-        setGrade("");
+        setGrade(null);
+        setComment("");
       } else {
         setMessage({ type: "error", text: data.error || "추가에 실패했습니다." });
       }
@@ -210,14 +223,17 @@ function AddMovieForm() {
             </select>
           </div>
           <div className="field">
-            <label>내 평점 (0~5, 0.5 단위, 비워두면 미평가)</label>
+            <label>내 평점</label>
+            <StarRating value={grade} onChange={setGrade} />
+          </div>
+          <div className="field">
+            <label>한줄평 (선택)</label>
             <input
-              type="number"
-              min={0}
-              max={5}
-              step={0.5}
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
+              type="text"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="이 작품에 대한 한줄평…"
+              maxLength={200}
             />
           </div>
           <button className="btn" type="submit" disabled={submitting}>
@@ -227,6 +243,136 @@ function AddMovieForm() {
       )}
 
       {message && message.type === "success" && selected === null && (
+        <div className="msg success">{message.text}</div>
+      )}
+    </>
+  );
+}
+
+function EditMovieSection() {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [editing, setEditing] = useState<Movie | null>(null);
+  const [grade, setGrade] = useState<number | null>(null);
+  const [comment, setComment] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
+
+  function loadMovies() {
+    setLoading(true);
+    fetch("/api/movies")
+      .then((r) => r.json())
+      .then((d) => setMovies(d.items || []))
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    loadMovies();
+  }, []);
+
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? movies.filter((m) => [m.titleKr, m.titleEn, m.titleJa].join(" ").toLowerCase().includes(q))
+    : [];
+
+  function startEdit(m: Movie) {
+    setEditing(m);
+    setGrade(m.grade == null ? null : Number(m.grade));
+    setComment(m.comment || "");
+    setMessage(null);
+  }
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editing) return;
+    setSaving(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/admin/edit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: editing.id, grade, comment }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMessage({ type: "success", text: `"${data.title}" 수정 완료!` });
+        setEditing(null);
+        setQuery("");
+        loadMovies();
+      } else {
+        setMessage({ type: "error", text: data.error || "수정에 실패했습니다." });
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) return <p className="sub">불러오는 중…</p>;
+
+  return (
+    <>
+      {!editing ? (
+        <>
+          <div className="field">
+            <label>제목으로 찾기</label>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="수정할 작품 제목…"
+            />
+          </div>
+          {filtered.length > 0 && (
+            <div className="search-results">
+              {filtered.slice(0, 15).map((m) => (
+                <button key={m.id} type="button" className="search-result" onClick={() => startEdit(m)}>
+                  <div className="info">
+                    <div className="t">{getTitle(m, "ko")}</div>
+                    <div className="y">
+                      {m.year} · {m.grade != null ? `★ ${Number(m.grade).toFixed(1)}` : "미평가"}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <form onSubmit={save}>
+          {message && <div className={"msg " + message.type}>{message.text}</div>}
+          <div className="field">
+            <label>수정 중인 작품</label>
+            <div style={{ fontSize: 14, padding: "8px 0" }}>
+              {getTitle(editing, "ko")} ({editing.year})
+            </div>
+          </div>
+          <div className="field">
+            <label>내 평점</label>
+            <StarRating value={grade} onChange={setGrade} />
+          </div>
+          <div className="field">
+            <label>한줄평</label>
+            <input
+              type="text"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="이 작품에 대한 한줄평…"
+              maxLength={200}
+            />
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button className="btn" type="submit" disabled={saving}>
+              {saving ? "저장 중…" : "저장"}
+            </button>
+            <button className="btn secondary" type="button" onClick={() => setEditing(null)}>
+              취소
+            </button>
+          </div>
+        </form>
+      )}
+
+      {message && message.type === "success" && !editing && (
         <div className="msg success">{message.text}</div>
       )}
     </>

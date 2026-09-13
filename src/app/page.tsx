@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   I18N,
   LOCALE,
+  LANG_FLAG,
   Lang,
   Movie,
   getTitle,
@@ -138,10 +139,16 @@ export default function Home() {
         </div>
         <div className="hero-side">
           <div className="hero-tools">
-            <div className="segmented">
+            <div className="segmented lang-segmented">
               {(["ko", "en", "ja"] as Lang[]).map((l) => (
-                <button key={l} className={lang === l ? "active" : ""} onClick={() => setLang(l)}>
-                  {l.toUpperCase()}
+                <button
+                  key={l}
+                  className={lang === l ? "active" : ""}
+                  onClick={() => setLang(l)}
+                  aria-label={l}
+                  title={l.toUpperCase()}
+                >
+                  {LANG_FLAG[l]}
                 </button>
               ))}
             </div>
@@ -373,6 +380,12 @@ function MovieModal({
             ))}
           </div>
           <div className="modal-overview">{getOverview(item, lang) || t.noOverview}</div>
+          {item.comment && (
+            <div className="modal-note">
+              <span className="label">{t.myNote}</span>
+              <p>{item.comment}</p>
+            </div>
+          )}
           <div className="modal-cast">
             <span className="label">{t.castLabel}</span>
             <span>{getCasting(item, lang) || t.noInfo}</span>

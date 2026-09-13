@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
   const mediaType = body.mediaType as MediaType;
   const grade = body.grade === "" || body.grade == null ? null : Number(body.grade);
   const category = body.category === "drama" ? "drama" : "movie";
+  const comment = typeof body.comment === "string" && body.comment.trim() ? body.comment.trim() : null;
 
   if (!tmdbId || (mediaType !== "movie" && mediaType !== "tv")) {
     return NextResponse.json({ error: "tmdbId and mediaType are required" }, { status: 400 });
@@ -37,8 +38,8 @@ export async function POST(req: NextRequest) {
   const rows = await query<{ id: number }>(
     `INSERT INTO movies
        (title_kr, title_en, title_ja, year, country, genre, grade, casting,
-        cast_search, overview, vote_average, poster_key, category, tmdb_id, media_type)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+        cast_search, overview, vote_average, poster_key, comment, category, tmdb_id, media_type)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
      RETURNING id`,
     [
       data.titleKr,
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
       JSON.stringify(data.overview),
       data.voteAverage,
       JSON.stringify(data.posterKey),
+      comment,
       category,
       data.tmdbId,
       data.mediaType,

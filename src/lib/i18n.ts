@@ -34,6 +34,7 @@ export interface I18nStrings {
   noInfo: string;
   noOverview: string;
   adminLink: string;
+  myNote: string;
 }
 
 export const I18N: Record<Lang, I18nStrings> = {
@@ -69,6 +70,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     noInfo: "정보 없음",
     noOverview: "줄거리 정보가 없습니다.",
     adminLink: "관리자",
+    myNote: "한줄평",
   },
   en: {
     siteTitle: "FilmLog",
@@ -102,6 +104,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     noInfo: "No info",
     noOverview: "No synopsis available.",
     adminLink: "Admin",
+    myNote: "My Note",
   },
   ja: {
     siteTitle: "フィルムログ",
@@ -135,6 +138,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     noInfo: "情報なし",
     noOverview: "あらすじ情報がありません。",
     adminLink: "管理者",
+    myNote: "ひとこと感想",
   },
 };
 
@@ -152,6 +156,7 @@ export interface Movie {
   overview: { ko: string; en: string; ja: string };
   voteAverage: number | string | null;
   posterKey: { ko: string | null; en: string | null; ja: string | null };
+  comment: string | null;
   category: "movie" | "drama";
   tmdbId: number;
   mediaType: "movie" | "tv";
@@ -174,6 +179,8 @@ export function getCountry(item: Movie, lang: Lang): string {
 export function getCasting(item: Movie, lang: Lang): string {
   return item.casting?.[lang] || "";
 }
+export const LANG_FLAG: Record<Lang, string> = { ko: "🇰🇷", en: "🇺🇸", ja: "🇯🇵" };
+
 export function posterUrl(path: string | null | undefined, size: string = "w185"): string | null {
   if (!path) return null;
   return `https://image.tmdb.org/t/p/${size}${path}`;
