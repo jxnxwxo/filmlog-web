@@ -209,16 +209,31 @@ body {
 .search-box input:focus { border-color: var(--accent); }
 .search-box svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--text-faint); }
 
-select#sortBy {
-  flex: 0 0 150px;
+.sort-box { position: relative; flex: 0 0 172px; }
+.sort-box select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
   border-radius: 8px;
-  padding: 9px 10px;
+  padding: 9px 30px 9px 12px;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 13.5px;
   outline: none;
+  cursor: pointer;
+}
+.sort-box svg {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  stroke: var(--text-faint);
+  pointer-events: none;
 }
 
 button:focus-visible, input:focus-visible, select:focus-visible, .poster-card:focus-visible {
@@ -365,7 +380,11 @@ footer.note {
   animation: modalIn .2s ease;
 }
 @keyframes modalIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
-.modal-poster { background: var(--surface-2); }
+.modal-poster {
+  background: var(--surface-2);
+  aspect-ratio: 2 / 3;
+  align-self: start;
+}
 .modal-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .modal-body { padding: 28px 30px; min-width: 0; position: relative; }
 .modal-close {
@@ -419,7 +438,7 @@ footer.note {
   .wrap { padding: 0 16px 60px; }
   .segmented { width: 100%; }
   .lang-segmented { width: auto; }
-  .search-box, select#sortBy { flex-basis: 100%; }
+  .search-box, .sort-box { flex-basis: 100%; }
 }
 
 /* ---------- Admin page ---------- */

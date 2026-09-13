@@ -36,6 +36,8 @@ export interface I18nStrings {
   noOverview: string;
   adminLink: string;
   myNote: string;
+  adminPanel: string;
+  logout: string;
 }
 
 export const I18N: Record<Lang, I18nStrings> = {
@@ -73,6 +75,8 @@ export const I18N: Record<Lang, I18nStrings> = {
     noOverview: "줄거리 정보가 없습니다.",
     adminLink: "관리자",
     myNote: "한줄평",
+    adminPanel: "관리자 화면",
+    logout: "로그아웃",
   },
   en: {
     siteTitle: "FilmLog",
@@ -108,6 +112,8 @@ export const I18N: Record<Lang, I18nStrings> = {
     noOverview: "No synopsis available.",
     adminLink: "Admin",
     myNote: "My Note",
+    adminPanel: "Admin Panel",
+    logout: "Log out",
   },
   ja: {
     siteTitle: "フィルムログ",
@@ -143,6 +149,8 @@ export const I18N: Record<Lang, I18nStrings> = {
     noOverview: "あらすじ情報がありません。",
     adminLink: "管理者",
     myNote: "ひとこと感想",
+    adminPanel: "管理画面",
+    logout: "ログアウト",
   },
 };
 

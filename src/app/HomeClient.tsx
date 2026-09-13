@@ -39,6 +39,14 @@ function SearchIcon() {
   );
 }
 
+function ChevronIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  );
+}
+
 function SunMoonIcon({ dark }: { dark: boolean }) {
   return dark ? (
     <svg className="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -178,9 +186,14 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
               <SunMoonIcon dark={theme === "dark"} />
             </button>
             {isAdminView ? (
-              <button className="admin-link" onClick={adminLogout} type="button">
-                로그아웃
-              </button>
+              <div style={{ display: "flex", gap: 8 }}>
+                <Link href="/admin" className="admin-link">
+                  {t.adminPanel}
+                </Link>
+                <button className="admin-link" onClick={adminLogout} type="button">
+                  {t.logout}
+                </button>
+              </div>
             ) : (
               <Link href="/admin" className="admin-link">
                 {t.adminLink}
@@ -230,13 +243,16 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <select value={sort} onChange={(e) => setSort(e.target.value as SortMode)}>
-            <option value="title">{t.sortTitle}</option>
-            <option value="year-desc">{t.sortYearDesc}</option>
-            <option value="year-asc">{t.sortYearAsc}</option>
-            <option value="grade-desc">{t.sortGradeDesc}</option>
-            <option value="tmdb-desc">{t.sortTmdbDesc}</option>
-          </select>
+          <div className="sort-box">
+            <select value={sort} onChange={(e) => setSort(e.target.value as SortMode)}>
+              <option value="title">{t.sortTitle}</option>
+              <option value="year-desc">{t.sortYearDesc}</option>
+              <option value="year-asc">{t.sortYearAsc}</option>
+              <option value="grade-desc">{t.sortGradeDesc}</option>
+              <option value="tmdb-desc">{t.sortTmdbDesc}</option>
+            </select>
+            <ChevronIcon />
+          </div>
           <div className="segmented">
             <button className={view === "text" ? "active" : ""} onClick={() => setView("text")}>
               {t.viewText}
