@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import StarRating from "@/components/StarRating";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -18,6 +19,7 @@ interface SearchCandidate {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
   const [checking, setChecking] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [password, setPassword] = useState("");
@@ -40,6 +42,7 @@ export default function AdminPage() {
     });
     if (res.ok) {
       setIsAdmin(true);
+      router.push("/");
     } else {
       setLoginError("비밀번호가 올바르지 않습니다.");
     }

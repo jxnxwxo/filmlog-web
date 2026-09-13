@@ -162,7 +162,8 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
       <div className="hero">
         <div>
           <h1>{t.siteTitle}</h1>
-          <p>{t.siteSub(items.length)}</p>
+          <p>{t.siteSub}</p>
+          <p className="hero-credit">by @jxnxwxo · Powered by TMDB ({items.length})</p>
         </div>
         <div className="hero-side">
           <div className="hero-tools">

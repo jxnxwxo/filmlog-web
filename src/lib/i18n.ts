@@ -4,7 +4,7 @@ export const LOCALE: Record<Lang, string> = { ko: "ko", en: "en", ja: "ja" };
 
 export interface I18nStrings {
   siteTitle: string;
-  siteSub: (n: number) => string;
+  siteSub: string;
   statTotal: string;
   statAvg: string;
   tabMovie: string;
@@ -42,8 +42,8 @@ export interface I18nStrings {
 
 export const I18N: Record<Lang, I18nStrings> = {
   ko: {
-    siteTitle: "필름로그",
-    siteSub: (n: number) => `개인 관람 기록부 · TMDb 데이터로 검증된 ${n}편`,
+    siteTitle: "FILM & DRAMA ARCHIVE",
+    siteSub: "시청했던 영화/드라마 기록",
     statTotal: "수록 작품",
     statAvg: "평균 평점",
     tabMovie: "영화",
@@ -79,8 +79,8 @@ export const I18N: Record<Lang, I18nStrings> = {
     logout: "로그아웃",
   },
   en: {
-    siteTitle: "FilmLog",
-    siteSub: (n: number) => `Personal viewing log · ${n} titles verified with TMDb`,
+    siteTitle: "FILM & DRAMA ARCHIVE",
+    siteSub: "Movies & dramas I've watched",
     statTotal: "Titles",
     statAvg: "Avg. Rating",
     tabMovie: "Movies",
@@ -116,8 +116,8 @@ export const I18N: Record<Lang, I18nStrings> = {
     logout: "Log out",
   },
   ja: {
-    siteTitle: "フィルムログ",
-    siteSub: (n: number) => `個人視聴記録 · TMDbで検証済み${n}作品`,
+    siteTitle: "FILM & DRAMA ARCHIVE",
+    siteSub: "視聴した映画・ドラマの記録",
     statTotal: "収録作品",
     statAvg: "平均評価",
     tabMovie: "映画",
