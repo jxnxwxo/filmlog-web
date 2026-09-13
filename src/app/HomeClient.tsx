@@ -68,7 +68,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
   const [sort, setSort] = useState<SortMode>("grade-desc");
   const [lang, setLang] = useState<Lang>("ko");
   const [query, setQuery] = useState("");
-  const [theme, setTheme] = useState<"light" | "dark" | null>(null);
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [selected, setSelected] = useState<Movie | null>(null);
   const [isAdminView, setIsAdminView] = useState(false);
 
@@ -96,19 +96,15 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
     try {
       saved = localStorage.getItem("filmlog-theme");
     } catch {}
-    if (saved === "light" || saved === "dark") setTheme(saved);
+    if (saved === "light") setTheme("light");
   }, []);
 
   useEffect(() => {
-    if (theme) document.documentElement.setAttribute("data-theme", theme);
-    else document.documentElement.removeAttribute("data-theme");
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   function toggleTheme() {
-    const isDark =
-      theme === "dark" ||
-      (!theme && typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    const next = isDark ? "light" : "dark";
+    const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
     try {
       localStorage.setItem("filmlog-theme", next);
