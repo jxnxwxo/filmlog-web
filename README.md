@@ -2,7 +2,7 @@
 
 개인 영화·드라마 관람 기록 웹사이트. 원래 Notion 데이터베이스로 관리하던 목록을 웹페이지로 옮기고, TMDb API로 한국어/영어/일본어 메타데이터를 자동 보강하고, 관리자 로그인으로 직접 작품을 추가/수정/삭제할 수 있도록 발전시킨 프로젝트.
 
-- **배포 주소:** https://filmlog-web.vercel.app
+- **배포 주소:** https://jxnxwxo.vercel.app
 - **GitHub:** https://github.com/jxnxwxo/filmlog-web
 
 ## 기술 스택
