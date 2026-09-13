@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   I18N,
   LOCALE,
-  LANG_FLAG,
   Lang,
   Movie,
   getTitle,
@@ -13,8 +12,16 @@ import {
   getOverview,
   getCountry,
   getCasting,
+  getTopCast,
   posterUrl,
 } from "@/lib/i18n";
+import { FlagKR, FlagUS, FlagJP } from "@/components/Flags";
+
+const LANG_FLAG_ICON: Record<Lang, React.ComponentType<{ size?: number }>> = {
+  ko: FlagKR,
+  en: FlagUS,
+  ja: FlagJP,
+};
 
 type Category = "movie" | "drama";
 type CountryFilter = "all" | "kr" | "foreign";
@@ -140,17 +147,20 @@ export default function Home() {
         <div className="hero-side">
           <div className="hero-tools">
             <div className="segmented lang-segmented">
-              {(["ko", "en", "ja"] as Lang[]).map((l) => (
-                <button
-                  key={l}
-                  className={lang === l ? "active" : ""}
-                  onClick={() => setLang(l)}
-                  aria-label={l}
-                  title={l.toUpperCase()}
-                >
-                  {LANG_FLAG[l]}
-                </button>
-              ))}
+              {(["ko", "en", "ja"] as Lang[]).map((l) => {
+                const FlagIcon = LANG_FLAG_ICON[l];
+                return (
+                  <button
+                    key={l}
+                    className={lang === l ? "active" : ""}
+                    onClick={() => setLang(l)}
+                    aria-label={l}
+                    title={l.toUpperCase()}
+                  >
+                    <FlagIcon size={20} />
+                  </button>
+                );
+              })}
             </div>
             <button className="theme-toggle" aria-label="theme" onClick={toggleTheme}>
               <SunMoonIcon dark={theme === "dark"} />
@@ -173,48 +183,50 @@ export default function Home() {
       </div>
 
       <div className="controls">
-        <div className="segmented">
-          <button className={category === "movie" ? "active" : ""} data-cat="movie" onClick={() => setCategory("movie")}>
-            {t.tabMovie} <span className="n">{countMovie}</span>
-          </button>
-          <button className={category === "drama" ? "active" : ""} data-cat="drama" onClick={() => setCategory("drama")}>
-            {t.tabDrama} <span className="n">{countDrama}</span>
-          </button>
-        </div>
-        <div className="segmented">
-          <button className={country === "all" ? "active" : ""} onClick={() => setCountry("all")}>
-            {t.countryAll}
-          </button>
-          <button className={country === "kr" ? "active" : ""} onClick={() => setCountry("kr")}>
-            {t.countryKr}
-          </button>
-          <button className={country === "foreign" ? "active" : ""} onClick={() => setCountry("foreign")}>
-            {t.countryForeign}
-          </button>
-        </div>
-        <div className="search-box">
-          <SearchIcon />
-          <input
-            type="text"
-            placeholder={t.searchPlaceholder}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
-        <select value={sort} onChange={(e) => setSort(e.target.value as SortMode)}>
-          <option value="title">{t.sortTitle}</option>
-          <option value="year-desc">{t.sortYearDesc}</option>
-          <option value="year-asc">{t.sortYearAsc}</option>
-          <option value="grade-desc">{t.sortGradeDesc}</option>
-          <option value="tmdb-desc">{t.sortTmdbDesc}</option>
-        </select>
-        <div className="segmented">
-          <button className={view === "text" ? "active" : ""} onClick={() => setView("text")}>
-            {t.viewText}
-          </button>
-          <button className={view === "poster" ? "active" : ""} onClick={() => setView("poster")}>
-            {t.viewPoster}
-          </button>
+        <div className="controls-inner">
+          <div className="segmented">
+            <button className={category === "movie" ? "active" : ""} data-cat="movie" onClick={() => setCategory("movie")}>
+              {t.tabMovie} <span className="n">{countMovie}</span>
+            </button>
+            <button className={category === "drama" ? "active" : ""} data-cat="drama" onClick={() => setCategory("drama")}>
+              {t.tabDrama} <span className="n">{countDrama}</span>
+            </button>
+          </div>
+          <div className="segmented">
+            <button className={country === "all" ? "active" : ""} onClick={() => setCountry("all")}>
+              {t.countryAll}
+            </button>
+            <button className={country === "kr" ? "active" : ""} onClick={() => setCountry("kr")}>
+              {t.countryKr}
+            </button>
+            <button className={country === "foreign" ? "active" : ""} onClick={() => setCountry("foreign")}>
+              {t.countryForeign}
+            </button>
+          </div>
+          <div className="search-box">
+            <SearchIcon />
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <select value={sort} onChange={(e) => setSort(e.target.value as SortMode)}>
+            <option value="title">{t.sortTitle}</option>
+            <option value="year-desc">{t.sortYearDesc}</option>
+            <option value="year-asc">{t.sortYearAsc}</option>
+            <option value="grade-desc">{t.sortGradeDesc}</option>
+            <option value="tmdb-desc">{t.sortTmdbDesc}</option>
+          </select>
+          <div className="segmented">
+            <button className={view === "text" ? "active" : ""} onClick={() => setView("text")}>
+              {t.viewText}
+            </button>
+            <button className={view === "poster" ? "active" : ""} onClick={() => setView("poster")}>
+              {t.viewPoster}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -232,7 +244,9 @@ export default function Home() {
               <div>{t.listHeadTitle}</div>
               <div>{t.listHeadYear}</div>
               <div>{t.listHeadGenre}</div>
+              <div>{t.listHeadCast}</div>
               <div>{t.listHeadGrade}</div>
+              <div>{t.myNote}</div>
             </div>
             <div>
               {filtered.map((item) => (
@@ -291,7 +305,9 @@ function ListRow({
             </span>
           ))}
       </div>
+      <div className="row-cast">{getTopCast(item, lang) || "—"}</div>
       {grade ? <span className="row-grade">★ {grade}</span> : <span className="row-grade empty">{t.unrated}</span>}
+      <div className="row-comment">{item.comment || ""}</div>
     </button>
   );
 }

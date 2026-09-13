@@ -70,8 +70,8 @@ export default function StarRating({ value, onChange, size = 28 }: StarRatingPro
           );
         })}
       </div>
-      <span style={{ fontFamily: "var(--font-mono)", fontSize: 14, color: "var(--text-dim)", minWidth: 32 }}>
-        {value != null ? value.toFixed(1) : "—"}
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 14, color: hover != null ? "var(--accent)" : "var(--text-dim)", minWidth: 32 }}>
+        {hover != null ? hover.toFixed(1) : value != null ? value.toFixed(1) : "—"}
       </span>
       {value != null && (
         <button

@@ -58,7 +58,7 @@ export default function AdminPage() {
           ← 필름로그로 돌아가기
         </Link>
         <h1>관리자</h1>
-        <p className="sub">TMDb에서 검색해 새 영화·드라마를 추가합니다.</p>
+        <p className="sub">TMDb에서 검색해 새 영화·드라마를 추가하거나, 기존 평점·한줄평을 고칩니다.</p>
 
         {!isAdmin ? (
           <form onSubmit={login}>
@@ -81,19 +81,28 @@ export default function AdminPage() {
             <button className="btn secondary" onClick={logout} style={{ marginBottom: 20 }}>
               로그아웃
             </button>
-            <AddMovieForm />
+            <AdminTabs />
           </>
         )}
       </div>
-
-      {isAdmin && (
-        <div className="admin-card" style={{ marginTop: 24 }}>
-          <h1 style={{ fontSize: 20 }}>기존 작품 수정</h1>
-          <p className="sub">평점과 한줄평을 고칠 수 있어요.</p>
-          <EditMovieSection />
-        </div>
-      )}
     </div>
+  );
+}
+
+function AdminTabs() {
+  const [tab, setTab] = useState<"add" | "edit">("add");
+  return (
+    <>
+      <div className="segmented" style={{ width: "100%", marginBottom: 20 }}>
+        <button className={tab === "add" ? "active" : ""} onClick={() => setTab("add")} type="button">
+          새 작품 추가
+        </button>
+        <button className={tab === "edit" ? "active" : ""} onClick={() => setTab("edit")} type="button">
+          기존 작품 수정
+        </button>
+      </div>
+      {tab === "add" ? <AddMovieForm /> : <EditMovieSection />}
+    </>
   );
 }
 

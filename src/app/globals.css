@@ -151,6 +151,10 @@ body {
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
   padding: 14px 28px;
+}
+.controls-inner {
+  max-width: 1320px;
+  margin: 0 auto;
   display: flex;
   gap: 16px;
   align-items: center;
@@ -278,8 +282,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, .poster-card:fo
 /* ---------- Text list view ---------- */
 .list-head, .list-row {
   display: grid;
-  grid-template-columns: 2.3fr 0.9fr 1.5fr 0.7fr;
-  gap: 16px;
+  grid-template-columns: 1.7fr 0.85fr 1.05fr 1.2fr 0.55fr 1.3fr;
+  gap: 14px;
   align-items: center;
 }
 .list-head {
@@ -307,13 +311,17 @@ button:focus-visible, input:focus-visible, select:focus-visible, .poster-card:fo
 .row-title-en { font-size: 11.5px; color: var(--text-faint); font-style: italic; margin-top: 2px; }
 .row-meta { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
 .row-genre { display: flex; flex-wrap: wrap; gap: 5px; }
+.row-cast { font-size: 12.5px; color: var(--text-dim); }
+.row-comment { font-size: 12.5px; color: var(--text-dim); font-style: italic; }
 .row-grade { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--accent); }
 .row-grade.empty { color: var(--text-faint); font-weight: 400; font-size: 12px; }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .list-head { display: none; }
   .list-row { grid-template-columns: 1fr; gap: 6px; padding: 14px 10px; position: relative; }
   .row-grade { position: absolute; top: 14px; right: 10px; }
+  .row-cast::before { content: "🎭 "; }
+  .row-comment:not(:empty)::before { content: "💬 "; font-style: normal; }
 }
 
 .pill { font-size: 11px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-dim); background: var(--surface-2); }
@@ -462,7 +470,10 @@ footer.note {
   border: 1px solid var(--border);
   cursor: pointer;
   background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
   text-align: left;
+  width: 100%;
 }
 .search-result.selected { border-color: var(--accent); background: var(--accent-soft); }
 .search-result img { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; background: var(--surface-2); }

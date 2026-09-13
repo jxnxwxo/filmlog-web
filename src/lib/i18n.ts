@@ -23,6 +23,7 @@ export interface I18nStrings {
   listHeadTitle: string;
   listHeadYear: string;
   listHeadGenre: string;
+  listHeadCast: string;
   listHeadGrade: string;
   shownSuffix: string;
   emptyState: string;
@@ -59,6 +60,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     listHeadTitle: "제목",
     listHeadYear: "연도 · 국가",
     listHeadGenre: "장르",
+    listHeadCast: "배우",
     listHeadGrade: "평점",
     shownSuffix: "편 표시 중",
     emptyState: "일치하는 작품이 없습니다.",
@@ -93,6 +95,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     listHeadTitle: "Title",
     listHeadYear: "Year · Country",
     listHeadGenre: "Genre",
+    listHeadCast: "Cast",
     listHeadGrade: "Rating",
     shownSuffix: " shown",
     emptyState: "No matching titles.",
@@ -127,6 +130,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     listHeadTitle: "タイトル",
     listHeadYear: "年・国",
     listHeadGenre: "ジャンル",
+    listHeadCast: "出演者",
     listHeadGrade: "評価",
     shownSuffix: "件表示中",
     emptyState: "該当する作品がありません。",
@@ -178,6 +182,11 @@ export function getCountry(item: Movie, lang: Lang): string {
 }
 export function getCasting(item: Movie, lang: Lang): string {
   return item.casting?.[lang] || "";
+}
+export function getTopCast(item: Movie, lang: Lang, n: number = 2): string {
+  const full = getCasting(item, lang);
+  if (!full) return "";
+  return full.split(",").map((s) => s.trim()).slice(0, n).join(", ");
 }
 export const LANG_FLAG: Record<Lang, string> = { ko: "🇰🇷", en: "🇺🇸", ja: "🇯🇵" };
 
