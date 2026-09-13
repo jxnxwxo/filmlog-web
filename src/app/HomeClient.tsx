@@ -65,7 +65,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
   const [category, setCategory] = useState<Category>("movie");
   const [country, setCountry] = useState<CountryFilter>("all");
   const [view, setView] = useState<ViewMode>("text");
-  const [sort, setSort] = useState<SortMode>("title");
+  const [sort, setSort] = useState<SortMode>("grade-desc");
   const [lang, setLang] = useState<Lang>("ko");
   const [query, setQuery] = useState("");
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
@@ -154,8 +154,6 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
 
   const countMovie = items.filter((d) => d.category === "movie").length;
   const countDrama = items.filter((d) => d.category === "drama").length;
-  const graded = items.map((d) => parseFloat(String(d.grade))).filter((n) => !isNaN(n));
-  const avgGrade = graded.length ? (graded.reduce((a, b) => a + b, 0) / graded.length).toFixed(1) : "0.0";
 
   return (
     <>
@@ -163,7 +161,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
         <div>
           <h1>{t.siteTitle}</h1>
           <p>{t.siteSub}</p>
-          <p className="hero-credit">by @jxnxwxo · Powered by TMDB ({items.length})</p>
+          <p className="hero-credit">by @jxnxwxo · Powered by TMDB</p>
         </div>
         <div className="hero-side">
           <div className="hero-tools">
@@ -200,16 +198,6 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
                 {t.adminLink}
               </Link>
             )}
-          </div>
-          <div className="hero-stats">
-            <div className="stat">
-              <b>{items.length}</b>
-              <span>{t.statTotal}</span>
-            </div>
-            <div className="stat">
-              <b>{avgGrade}</b>
-              <span>{t.statAvg}</span>
-            </div>
           </div>
         </div>
       </div>
@@ -280,12 +268,19 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
               <div>{t.listHeadYear}</div>
               <div>{t.listHeadGenre}</div>
               <div>{t.listHeadCast}</div>
-              <div>{t.listHeadGrade}</div>
+              <div>{sort === "tmdb-desc" ? "TMDB" : t.listHeadGrade}</div>
               <div>{t.myNote}</div>
             </div>
             <div>
               {filtered.map((item) => (
-                <ListRow key={item.id} item={item} lang={lang} t={t} onOpen={() => setSelected(item)} />
+                <ListRow
+                  key={item.id}
+                  item={item}
+                  lang={lang}
+                  t={t}
+                  showTmdb={sort === "tmdb-desc"}
+                  onOpen={() => setSelected(item)}
+                />
               ))}
             </div>
           </>
@@ -323,16 +318,19 @@ function ListRow({
   item,
   lang,
   t,
+  showTmdb,
   onOpen,
 }: {
   item: Movie;
   lang: Lang;
   t: (typeof I18N)["ko"];
+  showTmdb: boolean;
   onOpen: () => void;
 }) {
   const title = getTitle(item, lang);
   const metaLine = [item.year, getCountry(item, lang)].filter(Boolean).join(" · ") || "—";
-  const grade = item.grade ? parseFloat(String(item.grade)).toFixed(1) : null;
+  const gradeRaw = showTmdb ? item.voteAverage : item.grade;
+  const grade = gradeRaw != null && gradeRaw !== "" ? parseFloat(String(gradeRaw)).toFixed(1) : null;
   return (
     <button className="list-row" onClick={onOpen}>
       <div>
@@ -390,7 +388,7 @@ function MovieModal({
 }) {
   const title = getTitle(item, lang);
   const showSub = item.titleKr && title !== item.titleKr;
-  const src = posterUrl(item.posterKey?.[lang] || item.posterKey?.ko, "w342");
+  const src = posterUrl(item.posterKey?.[lang] || item.posterKey?.ko, "w185");
   const grade = item.grade ? parseFloat(String(item.grade)).toFixed(1) : "—";
   const vote = item.voteAverage ? parseFloat(String(item.voteAverage)).toFixed(1) : "—";
 
@@ -452,18 +450,22 @@ function MovieModal({
       }}
     >
       <div className="modal" role="dialog" aria-modal="true">
-        <div className="modal-poster">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          {src && <img src={src} alt="" />}
-        </div>
         <div className="modal-body">
           <button className="modal-close" aria-label="close" onClick={onClose}>
             &times;
           </button>
-          <span className={"modal-cat " + item.category}>{item.category === "movie" ? t.tabMovie : t.tabDrama}</span>
-          <h2 className="modal-title">{title}</h2>
-          {showSub && <div className="modal-sub">{item.titleKr}</div>}
-          <div className="modal-meta">{[item.year, getCountry(item, lang)].filter(Boolean).join(" · ")}</div>
+          <div className="modal-head">
+            <div className="modal-thumb">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {src && <img src={src} alt="" />}
+            </div>
+            <div className="modal-head-info">
+              <span className={"modal-cat " + item.category}>{item.category === "movie" ? t.tabMovie : t.tabDrama}</span>
+              <h2 className="modal-title">{title}</h2>
+              {showSub && <div className="modal-sub">{item.titleKr}</div>}
+              <div className="modal-meta">{[item.year, getCountry(item, lang)].filter(Boolean).join(" · ")}</div>
+            </div>
+          </div>
           <div className="rating-row">
             <div className="rating-box mine">
               <div className="label">{t.myRating}</div>

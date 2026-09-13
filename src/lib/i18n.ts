@@ -5,8 +5,6 @@ export const LOCALE: Record<Lang, string> = { ko: "ko", en: "en", ja: "ja" };
 export interface I18nStrings {
   siteTitle: string;
   siteSub: string;
-  statTotal: string;
-  statAvg: string;
   tabMovie: string;
   tabDrama: string;
   countryAll: string;
@@ -44,8 +42,6 @@ export const I18N: Record<Lang, I18nStrings> = {
   ko: {
     siteTitle: "FILM & DRAMA ARCHIVE",
     siteSub: "시청했던 영화/드라마 기록",
-    statTotal: "수록 작품",
-    statAvg: "평균 평점",
     tabMovie: "영화",
     tabDrama: "드라마",
     countryAll: "전체",
@@ -81,8 +77,6 @@ export const I18N: Record<Lang, I18nStrings> = {
   en: {
     siteTitle: "FILM & DRAMA ARCHIVE",
     siteSub: "Movies & dramas I've watched",
-    statTotal: "Titles",
-    statAvg: "Avg. Rating",
     tabMovie: "Movies",
     tabDrama: "Dramas",
     countryAll: "All",
@@ -118,8 +112,6 @@ export const I18N: Record<Lang, I18nStrings> = {
   ja: {
     siteTitle: "FILM & DRAMA ARCHIVE",
     siteSub: "視聴した映画・ドラマの記録",
-    statTotal: "収録作品",
-    statAvg: "平均評価",
     tabMovie: "映画",
     tabDrama: "ドラマ",
     countryAll: "すべて",
