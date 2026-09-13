@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { isAdmin } from "@/lib/auth";
 import { query } from "@/lib/db";
 
@@ -27,6 +28,8 @@ export async function POST(req: NextRequest) {
   if (rows.length === 0) {
     return NextResponse.json({ error: "Movie not found" }, { status: 404 });
   }
+
+  revalidatePath("/");
 
   return NextResponse.json({ ok: true, id: rows[0].id, title: rows[0].title_kr });
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { isAdmin } from "@/lib/auth";
 import { fetchFullMovieData, MediaType } from "@/lib/tmdb";
 import { query } from "@/lib/db";
@@ -60,6 +61,8 @@ export async function POST(req: NextRequest) {
       data.mediaType,
     ]
   );
+
+  revalidatePath("/");
 
   return NextResponse.json({
     ok: true,
