@@ -472,7 +472,8 @@ footer.note {
   .modal { max-height: 90vh; overflow-y: auto; }
   .modal-thumb { width: 68px; }
   .hero { padding: var(--space-40) var(--space-20) var(--space-24); }
-  .controls { padding: var(--space-12) var(--space-16); }
+  /* Stacked category/country/search/sort/view rows make this bar too tall to stay pinned on a phone screen */
+  .controls { position: static; padding: var(--space-12) var(--space-16); }
   .wrap { padding: 0 var(--space-16) 60px; }
   .segmented { width: 100%; }
   .lang-segmented { width: auto; }
