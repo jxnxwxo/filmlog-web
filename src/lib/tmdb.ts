@@ -80,7 +80,7 @@ const COUNTRY_I18N: Record<string, { ko: string; en: string; ja: string }> = {
   HK: { ko: "홍콩", en: "Hong Kong", ja: "香港" },
 };
 
-function normalizeCountry(raw: string) {
+export function normalizeCountry(raw: string) {
   return COUNTRY_I18N[raw] || { ko: raw, en: raw, ja: raw };
 }
 
@@ -154,10 +154,14 @@ export async function fetchFullMovieData(
 
   const titleOf = (d: TmdbDetails) => (mediaType === "movie" ? d.title : d.name) || "";
   const dateOf = (d: TmdbDetails) => (mediaType === "movie" ? d.release_date : d.first_air_date) || "";
-  const countriesOf = (d: TmdbDetails) =>
-    mediaType === "movie"
-      ? (d.production_countries || []).map((c) => c.iso_3166_1 || c.name || "")
-      : d.origin_country || [];
+  // origin_country reflects the production's actual home country; production_countries
+  // is unordered and often lists filming locations first (e.g. Before Sunrise lists
+  // Austria before the US even though it's a US production), so prefer origin_country
+  // and only fall back to production_countries when it's missing.
+  const countriesOf = (d: TmdbDetails) => {
+    if (d.origin_country && d.origin_country.length > 0) return d.origin_country;
+    return (d.production_countries || []).map((c) => c.iso_3166_1 || c.name || "");
+  };
 
   const rawCountry = countriesOf(ko)[0] || countriesOf(en)[0] || "";
   const country = normalizeCountry(rawCountry);
