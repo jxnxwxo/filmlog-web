@@ -47,6 +47,15 @@ function ChevronIcon() {
   );
 }
 
+function ArrowUpIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="19" x2="12" y2="5"></line>
+      <polyline points="5 12 12 5 19 12"></polyline>
+    </svg>
+  );
+}
+
 function SunMoonIcon({ dark }: { dark: boolean }) {
   return dark ? (
     <svg className="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -71,6 +80,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [selected, setSelected] = useState<Movie | null>(null);
   const [isAdminView, setIsAdminView] = useState(false);
+  const [showTop, setShowTop] = useState(false);
 
   const t = I18N[lang];
 
@@ -79,6 +89,22 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
       .then((r) => r.json())
       .then((data) => setItems(data.items || []));
   }
+
+  function goHome() {
+    setCategory("movie");
+    setCountry("all");
+    setQuery("");
+    setSort("grade-desc");
+    setView("text");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    refreshMovies();
+  }
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 500);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     fetch("/api/admin/session")
@@ -155,7 +181,9 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
     <>
       <div className="hero">
         <div>
-          <h1>{t.siteTitle}</h1>
+          <h1 onClick={goHome} role="button" tabIndex={0} title={t.siteTitle}>
+            {t.siteTitle}
+          </h1>
           <p>{t.siteSub}</p>
           <p className="hero-credit">by @jxnxwxo · Powered by TMDB</p>
         </div>
@@ -226,6 +254,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
               placeholder={t.searchPlaceholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onFocus={(e) => e.currentTarget.scrollIntoView({ behavior: "smooth", block: "start" })}
             />
           </div>
           <div className="sort-box">
@@ -293,6 +322,16 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
           {t.footSuffix}
         </footer>
       </div>
+
+      {showTop && (
+        <button
+          className="back-to-top"
+          aria-label="맨 위로"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
+          <ArrowUpIcon />
+        </button>
+      )}
 
       {selected && (
         <MovieModal
