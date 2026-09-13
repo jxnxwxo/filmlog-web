@@ -24,6 +24,7 @@ function Star({ fill }: { fill: number }) {
         stroke="var(--text-faint)"
         strokeWidth="1.2"
       />
+      {/* DESIGN.md DO #1: Apple Blue (--accent) is allowed for selected/active states — a filled star is a selection fill, not decorative text */}
       <path
         d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.7-6.2 3.7 1.6-7-5.4-4.8 7.1-.7z"
         fill="var(--accent)"
@@ -70,7 +71,8 @@ export default function StarRating({ value, onChange, size = 28 }: StarRatingPro
           );
         })}
       </div>
-      <span style={{ fontFamily: "var(--font-mono)", fontSize: 14, color: hover != null ? "var(--accent)" : "var(--text-dim)", minWidth: 32 }}>
+      {/* DESIGN.md DON'T: Apple Blue (--accent) is fill-only, so hover emphasis text uses Link Blue (--accent-text) */}
+      <span style={{ fontFamily: "var(--font-body)", fontSize: 14, color: hover != null ? "var(--accent-text)" : "var(--text-dim)", minWidth: 32 }}>
         {hover != null ? hover.toFixed(1) : value != null ? value.toFixed(1) : "—"}
       </span>
       {value != null && (
