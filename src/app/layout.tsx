@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ClickBurst from "@/components/ClickBurst";
 
 export const metadata: Metadata = {
   title: "FILM & DRAMA ARCHIVE",
@@ -28,7 +29,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ClickBurst />
+      </body>
     </html>
   );
 }
