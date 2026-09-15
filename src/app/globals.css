@@ -580,13 +580,36 @@ footer.note {
 @media (max-width: 620px) {
   .modal { max-height: 90vh; overflow-y: auto; }
   .modal-thumb { width: 68px; }
-  .hero { padding: var(--space-40) var(--space-20) var(--space-24); }
-  /* Stacked category/country/search/sort/view rows make this bar too tall to stay pinned on a phone screen */
+
+  /* Shrink the hero so it doesn't push the movie list below the fold on a phone */
+  .hero { padding: var(--space-24) var(--space-16) var(--space-16); gap: var(--space-12); }
+  .hero h1 { font-size: clamp(28px, 9vw, 40px); margin-bottom: var(--space-4); }
+  .hero p.hero-credit { margin-top: 2px; }
+  .hero-side { gap: var(--space-8); }
+  .hero-tools { gap: var(--space-4); }
+  .lang-segmented button { padding: 6px var(--space-8); font-size: 14px; }
+  .theme-toggle { width: 30px; height: 30px; }
+  .theme-toggle svg { width: 14px; height: 14px; }
+  .admin-link { padding: 3px var(--space-8); }
+
+  /* Stacked full-width rows made the controls bar too tall on a phone screen, so it's no
+     longer pinned; pairing short controls two-to-a-row (category+country, sort+rating,
+     view+export) gets the movie list visible sooner without a sticky bar. */
   .controls { position: static; padding: var(--space-12) var(--space-16); }
   .wrap { padding: 0 var(--space-16) 60px; }
-  .segmented { width: 100%; }
-  .lang-segmented { width: auto; }
-  .search-box, .sort-box, .rating-filter, .export-btn { flex-basis: 100%; }
+  .controls-inner { gap: var(--space-8); }
+  .segmented { width: auto; }
+  .search-box { flex-basis: 100%; }
+  .category-segmented, .country-segmented, .sort-box, .rating-filter, .view-segmented, .export-btn {
+    flex: 1 1 calc(50% - var(--space-4));
+    min-width: 0;
+  }
+  .category-segmented button, .country-segmented button, .view-segmented button { flex: 1 1 0; min-width: 0; }
+  .category-segmented button, .country-segmented button {
+    padding: 6px 4px;
+    font-size: 13px;
+  }
+  .category-segmented .n { margin-left: 2px; }
   .export-btn { justify-content: center; }
   .rating-filter-trigger { width: 100%; justify-content: center; }
   input, select, textarea { font-size: 16px !important; }
