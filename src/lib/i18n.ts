@@ -10,7 +10,10 @@ export interface I18nStrings {
   countryAll: string;
   countryKr: string;
   countryForeign: string;
-  searchPlaceholder: string;
+  searchByTitle: string;
+  searchByCast: string;
+  searchPlaceholderTitle: string;
+  searchPlaceholderCast: string;
   sortTitle: string;
   sortYearDesc: string;
   sortYearAsc: string;
@@ -53,7 +56,10 @@ export const I18N: Record<Lang, I18nStrings> = {
     countryAll: "전체",
     countryKr: "한국",
     countryForeign: "해외",
-    searchPlaceholder: "제목, 출연진으로 검색…",
+    searchByTitle: "제목",
+    searchByCast: "배우",
+    searchPlaceholderTitle: "제목으로 검색…",
+    searchPlaceholderCast: "배우, 감독으로 검색…",
     sortTitle: "제목순",
     sortYearDesc: "연도 최신순",
     sortYearAsc: "연도 오래된순",
@@ -94,7 +100,10 @@ export const I18N: Record<Lang, I18nStrings> = {
     countryAll: "All",
     countryKr: "Korean",
     countryForeign: "International",
-    searchPlaceholder: "Search by title or cast…",
+    searchByTitle: "Title",
+    searchByCast: "Cast",
+    searchPlaceholderTitle: "Search by title…",
+    searchPlaceholderCast: "Search by cast or director…",
     sortTitle: "Title",
     sortYearDesc: "Newest",
     sortYearAsc: "Oldest",
@@ -135,7 +144,10 @@ export const I18N: Record<Lang, I18nStrings> = {
     countryAll: "すべて",
     countryKr: "韓国",
     countryForeign: "海外",
-    searchPlaceholder: "タイトル・出演者で検索…",
+    searchByTitle: "タイトル",
+    searchByCast: "出演者",
+    searchPlaceholderTitle: "タイトルで検索…",
+    searchPlaceholderCast: "出演者・監督で検索…",
     sortTitle: "タイトル順",
     sortYearDesc: "新しい順",
     sortYearAsc: "古い順",

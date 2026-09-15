@@ -33,15 +33,6 @@ type SortMode = "title" | "year-desc" | "year-asc" | "grade-desc" | "tmdb-desc";
 
 const RATING_OPTIONS = [5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5];
 
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <circle cx="11" cy="11" r="7"></circle>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-  );
-}
-
 function ChevronIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -90,6 +81,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
   const [sort, setSort] = useState<SortMode>("grade-desc");
   const [lang, setLang] = useState<Lang>("ko");
   const [query, setQuery] = useState("");
+  const [searchScope, setSearchScope] = useState<"title" | "cast">("title");
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [selected, setSelected] = useState<Movie | null>(null);
   const [isAdminView, setIsAdminView] = useState(false);
@@ -110,6 +102,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
     setCategory("movie");
     setCountry("all");
     setQuery("");
+    setSearchScope("title");
     setSort("grade-desc");
     setView("text");
     setRatingFilter(new Set());
@@ -118,6 +111,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
   }
 
   function filterByPerson(name: string) {
+    setSearchScope("cast");
     setQuery(name);
     setSelected(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -216,10 +210,10 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
       if (country === "kr" && !isKr) return false;
       if (country === "foreign" && isKr) return false;
       if (q) {
-        const hay = [d.titleKr, d.titleEn, d.titleJa, d.castSearch, d.director?.ko, d.director?.en, d.director?.ja]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+        const hay =
+          searchScope === "cast"
+            ? [d.castSearch, d.director?.ko, d.director?.en, d.director?.ja].filter(Boolean).join(" ").toLowerCase()
+            : [d.titleKr, d.titleEn, d.titleJa].filter(Boolean).join(" ").toLowerCase();
         if (!hay.includes(q)) return false;
       }
       if (ratingFilter.size > 0) {
@@ -250,7 +244,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
         list.sort((a, b) => getTitle(a, lang).localeCompare(getTitle(b, lang), LOCALE[lang]));
     }
     return list;
-  }, [items, category, country, query, sort, lang, ratingFilter]);
+  }, [items, category, country, query, searchScope, sort, lang, ratingFilter]);
 
   const countMovie = items.filter((d) => d.category === "movie").length;
   const countDrama = items.filter((d) => d.category === "drama").length;
@@ -306,7 +300,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
 
       <div className="controls">
         <div className="controls-inner">
-          <div className="segmented">
+          <div className="segmented category-segmented">
             <button className={category === "movie" ? "active" : ""} data-cat="movie" onClick={() => setCategory("movie")}>
               {t.tabMovie} <span className="n">{countMovie}</span>
             </button>
@@ -314,7 +308,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
               {t.tabDrama} <span className="n">{countDrama}</span>
             </button>
           </div>
-          <div className="segmented">
+          <div className="segmented country-segmented">
             <button className={country === "all" ? "active" : ""} onClick={() => setCountry("all")}>
               {t.countryAll}
             </button>
@@ -326,10 +320,25 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
             </button>
           </div>
           <div className="search-box">
-            <SearchIcon />
+            <div className="search-scope">
+              <button
+                type="button"
+                className={searchScope === "title" ? "active" : ""}
+                onClick={() => setSearchScope("title")}
+              >
+                {t.searchByTitle}
+              </button>
+              <button
+                type="button"
+                className={searchScope === "cast" ? "active" : ""}
+                onClick={() => setSearchScope("cast")}
+              >
+                {t.searchByCast}
+              </button>
+            </div>
             <input
               type="text"
-              placeholder={t.searchPlaceholder}
+              placeholder={searchScope === "cast" ? t.searchPlaceholderCast : t.searchPlaceholderTitle}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={(e) => e.currentTarget.scrollIntoView({ behavior: "smooth", block: "start" })}
@@ -367,7 +376,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
               </div>
             )}
           </div>
-          <div className="segmented">
+          <div className="segmented view-segmented">
             <button className={view === "text" ? "active" : ""} onClick={() => setView("text")}>
               {t.viewText}
             </button>

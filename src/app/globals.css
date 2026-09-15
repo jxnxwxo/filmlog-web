@@ -194,15 +194,14 @@ body {
   padding: var(--space-4);
   gap: 2px;
   flex-shrink: 0;
-  width: 236px;
 }
 .segmented button {
-  flex: 1 1 0;
+  flex: 0 0 auto;
   font-family: var(--font-body);
   font-weight: 600; /* DESIGN.md SF Pro Text role: "600 for nav items and button text" */
   font-size: var(--text-body-sm); /* DESIGN.md Type Scale > body-sm */
   letter-spacing: var(--tracking-body-sm);
-  padding: var(--space-8);
+  padding: var(--space-8) var(--space-12);
   border-radius: var(--radius-pill); /* DESIGN.md Border Radius > buttons */
   border: none;
   background: transparent;
@@ -215,24 +214,45 @@ body {
 .segmented button.active { background: var(--accent); color: var(--surface); }
 .segmented button .n { opacity: .65; font-weight: 400; font-size: var(--text-caption); margin-left: var(--space-4); }
 
-.lang-segmented { width: auto; }
-.lang-segmented button { flex: 0 0 auto; padding: var(--space-8) var(--space-12); font-size: 16px; line-height: 1; }
+.lang-segmented button { padding: var(--space-8) var(--space-12); font-size: 16px; line-height: 1; }
 
-.search-box { position: relative; flex: 1 1 220px; min-width: 180px; scroll-margin-top: var(--space-12); }
-.search-box input {
-  width: 100%;
-  height: 100%;
+/* Karaoke-machine style: a compact title/cast scope toggle folded into the search box itself */
+.search-box {
+  display: flex;
+  align-items: stretch;
+  flex: 1 1 240px;
+  min-width: 200px;
   background: var(--surface);
   border: 1px solid var(--border);
-  color: var(--text);
   border-radius: var(--radius-card); /* DESIGN.md Border Radius > inputs */
-  padding: var(--space-8) var(--space-12) var(--space-8) 32px;
+  overflow: hidden;
+  scroll-margin-top: var(--space-12);
+}
+.search-box:focus-within { border-color: var(--accent); } /* DESIGN.md Form Input: focus ring in #0071e3 */
+.search-scope { display: flex; flex-shrink: 0; border-right: 1px solid var(--border); }
+.search-scope button {
+  padding: var(--space-8) var(--space-12);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-caption);
+  border: none;
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.search-scope button.active { background: var(--surface-2); color: var(--text); }
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  padding: var(--space-8) var(--space-12);
   font-family: var(--font-body);
   font-size: var(--text-body-sm); /* DESIGN.md Form Input: 14-17px text */
   outline: none;
 }
-.search-box input:focus { border-color: var(--accent); } /* DESIGN.md Form Input: focus ring in #0071e3 */
-.search-box svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--text-faint); }
 
 .sort-box { position: relative; flex: 0 0 172px; }
 .sort-box select {
