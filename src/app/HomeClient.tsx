@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   I18N,
@@ -31,6 +31,8 @@ type CountryFilter = "all" | "kr" | "foreign";
 type ViewMode = "text" | "poster";
 type SortMode = "title" | "year-desc" | "year-asc" | "grade-desc" | "tmdb-desc";
 
+const RATING_OPTIONS = [5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5];
+
 function SearchIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -53,6 +55,16 @@ function ArrowUpIcon() {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <line x1="12" y1="19" x2="12" y2="5"></line>
       <polyline points="5 12 12 5 19 12"></polyline>
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3v12"></path>
+      <polyline points="7 10 12 15 17 10"></polyline>
+      <path d="M5 21h14"></path>
     </svg>
   );
 }
@@ -82,6 +94,9 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
   const [selected, setSelected] = useState<Movie | null>(null);
   const [isAdminView, setIsAdminView] = useState(false);
   const [showTop, setShowTop] = useState(false);
+  const [ratingFilter, setRatingFilter] = useState<Set<number>>(new Set());
+  const [ratingPickerOpen, setRatingPickerOpen] = useState(false);
+  const ratingPickerRef = useRef<HTMLDivElement>(null);
 
   const t = I18N[lang];
 
@@ -97,8 +112,63 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
     setQuery("");
     setSort("grade-desc");
     setView("text");
+    setRatingFilter(new Set());
     window.scrollTo({ top: 0, behavior: "smooth" });
     refreshMovies();
+  }
+
+  function filterByPerson(name: string) {
+    setQuery(name);
+    setSelected(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function toggleRating(v: number) {
+    setRatingFilter((prev) => {
+      const next = new Set(prev);
+      if (next.has(v)) next.delete(v);
+      else next.add(v);
+      return next;
+    });
+  }
+
+  useEffect(() => {
+    if (!ratingPickerOpen) return;
+    function onDocClick(e: MouseEvent) {
+      if (ratingPickerRef.current && !ratingPickerRef.current.contains(e.target as Node)) {
+        setRatingPickerOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [ratingPickerOpen]);
+
+  function exportCsv() {
+    const headers = ["제목", "영문제목", "연도", "국가", "장르", "감독", "배우", "카테고리", "내평점", "TMDB평점", "한줄평"];
+    const rows = filtered.map((item) => [
+      item.titleKr,
+      item.titleEn,
+      item.year ?? "",
+      getCountry(item, "ko"),
+      getGenre(item, "ko").join("/"),
+      getDirector(item, "ko"),
+      getCasting(item, "ko"),
+      item.category === "movie" ? "영화" : "드라마",
+      item.grade ?? "",
+      item.voteAverage ?? "",
+      item.comment ?? "",
+    ]);
+    const escape = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const csv = [headers, ...rows].map((row) => row.map(escape).join(",")).join("\r\n");
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `filmlog-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   }
 
   useEffect(() => {
@@ -146,8 +216,15 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
       if (country === "kr" && !isKr) return false;
       if (country === "foreign" && isKr) return false;
       if (q) {
-        const hay = [d.titleKr, d.titleEn, d.titleJa, d.castSearch].join(" ").toLowerCase();
+        const hay = [d.titleKr, d.titleEn, d.titleJa, d.castSearch, d.director?.ko, d.director?.en, d.director?.ja]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
         if (!hay.includes(q)) return false;
+      }
+      if (ratingFilter.size > 0) {
+        const g = parseFloat(String(d.grade));
+        if (isNaN(g) || !ratingFilter.has(g)) return false;
       }
       return true;
     });
@@ -173,7 +250,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
         list.sort((a, b) => getTitle(a, lang).localeCompare(getTitle(b, lang), LOCALE[lang]));
     }
     return list;
-  }, [items, category, country, query, sort, lang]);
+  }, [items, category, country, query, sort, lang, ratingFilter]);
 
   const countMovie = items.filter((d) => d.category === "movie").length;
   const countDrama = items.filter((d) => d.category === "drama").length;
@@ -268,6 +345,28 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
             </select>
             <ChevronIcon />
           </div>
+          <div className="rating-filter" ref={ratingPickerRef}>
+            <button type="button" className="rating-filter-trigger" onClick={() => setRatingPickerOpen((v) => !v)}>
+              {t.ratingFilterLabel}
+              {ratingFilter.size > 0 ? ` (${ratingFilter.size})` : ""}
+              <ChevronIcon />
+            </button>
+            {ratingPickerOpen && (
+              <div className="rating-filter-panel">
+                {RATING_OPTIONS.map((v) => (
+                  <label key={v} className="rating-filter-option">
+                    <input type="checkbox" checked={ratingFilter.has(v)} onChange={() => toggleRating(v)} />
+                    ★ {v.toFixed(1)}
+                  </label>
+                ))}
+                {ratingFilter.size > 0 && (
+                  <button type="button" className="rating-filter-clear" onClick={() => setRatingFilter(new Set())}>
+                    {t.clearFilter}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
           <div className="segmented">
             <button className={view === "text" ? "active" : ""} onClick={() => setView("text")}>
               {t.viewText}
@@ -276,6 +375,10 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
               {t.viewPoster}
             </button>
           </div>
+          <button type="button" className="export-btn" onClick={exportCsv} title={t.exportCsv}>
+            <DownloadIcon />
+            <span>{t.exportCsv}</span>
+          </button>
         </div>
       </div>
 
@@ -342,6 +445,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
           t={t}
           isAdmin={isAdminView}
           onClose={() => setSelected(null)}
+          onSelectPerson={filterByPerson}
           onChanged={async () => {
             await refreshMovies();
           }}
@@ -409,12 +513,33 @@ function PosterCard({ item, lang, onOpen }: { item: Movie; lang: Lang; onOpen: (
   );
 }
 
+function PersonTags({ names, onSelect }: { names: string; onSelect: (name: string) => void }) {
+  const list = names
+    .split(",")
+    .map((n) => n.trim())
+    .filter(Boolean);
+  if (list.length === 0) return null;
+  return (
+    <span className="person-list">
+      {list.map((name, i) => (
+        <span key={name}>
+          <button type="button" className="person-tag" onClick={() => onSelect(name)}>
+            {name}
+          </button>
+          {i < list.length - 1 ? ", " : ""}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function MovieModal({
   item,
   lang,
   t,
   isAdmin,
   onClose,
+  onSelectPerson,
   onChanged,
 }: {
   item: Movie;
@@ -422,6 +547,7 @@ function MovieModal({
   t: (typeof I18N)["ko"];
   isAdmin: boolean;
   onClose: () => void;
+  onSelectPerson: (name: string) => void;
   onChanged: () => Promise<void>;
 }) {
   const title = getTitle(item, lang);
@@ -530,12 +656,21 @@ function MovieModal({
           )}
           <div className="modal-cast">
             <span className="label">{t.directorLabel}</span>
-            <span>{getDirector(item, lang) || t.noInfo}</span>
+            {getDirector(item, lang) ? (
+              <PersonTags names={getDirector(item, lang)} onSelect={onSelectPerson} />
+            ) : (
+              <span>{t.noInfo}</span>
+            )}
           </div>
           <div className="modal-cast">
             <span className="label">{t.castLabel}</span>
-            <span>{getCasting(item, lang) || t.noInfo}</span>
+            {getCasting(item, lang) ? (
+              <PersonTags names={getCasting(item, lang)} onSelect={onSelectPerson} />
+            ) : (
+              <span>{t.noInfo}</span>
+            )}
           </div>
+          <p className="person-note">{t.personFilterNote}</p>
 
           {isAdmin && (
             <div className="modal-admin">

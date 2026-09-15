@@ -38,6 +38,10 @@ export interface I18nStrings {
   myNote: string;
   adminPanel: string;
   logout: string;
+  personFilterNote: string;
+  ratingFilterLabel: string;
+  clearFilter: string;
+  exportCsv: string;
 }
 
 export const I18N: Record<Lang, I18nStrings> = {
@@ -77,6 +81,10 @@ export const I18N: Record<Lang, I18nStrings> = {
     myNote: "한줄평",
     adminPanel: "관리자 화면",
     logout: "로그아웃",
+    personFilterNote: "내가 본 작품 중에서만 필터링돼요",
+    ratingFilterLabel: "평점 필터",
+    clearFilter: "초기화",
+    exportCsv: "CSV 내보내기",
   },
   en: {
     siteTitle: "FILM & DRAMA ARCHIVE",
@@ -114,6 +122,10 @@ export const I18N: Record<Lang, I18nStrings> = {
     myNote: "My Note",
     adminPanel: "Admin Panel",
     logout: "Log out",
+    personFilterNote: "Only filters within what I've watched",
+    ratingFilterLabel: "Rating Filter",
+    clearFilter: "Clear",
+    exportCsv: "Export CSV",
   },
   ja: {
     siteTitle: "FILM & DRAMA ARCHIVE",
@@ -151,6 +163,10 @@ export const I18N: Record<Lang, I18nStrings> = {
     myNote: "ひとこと感想",
     adminPanel: "管理画面",
     logout: "ログアウト",
+    personFilterNote: "私が見た作品の中だけで絞り込まれます",
+    ratingFilterLabel: "評価フィルター",
+    clearFilter: "リセット",
+    exportCsv: "CSVエクスポート",
   },
 };
 
