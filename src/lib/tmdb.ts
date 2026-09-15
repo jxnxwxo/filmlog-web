@@ -24,6 +24,13 @@ interface TmdbCountry {
 interface TmdbCastMember {
   name: string;
 }
+interface TmdbCrewMember {
+  name: string;
+  job?: string;
+}
+interface TmdbCreator {
+  name: string;
+}
 interface TmdbDetails {
   title?: string;
   name?: string;
@@ -35,6 +42,7 @@ interface TmdbDetails {
   genres?: TmdbGenre[];
   production_countries?: TmdbCountry[];
   origin_country?: string[];
+  created_by?: TmdbCreator[];
 }
 interface TmdbSearchResult {
   id: number;
@@ -115,13 +123,21 @@ async function getDetails(id: number, mediaType: MediaType, lang: string): Promi
   return res.json();
 }
 
-async function getCastNames(id: number, mediaType: MediaType, lang: string): Promise<string[]> {
+async function getCredits(
+  id: number,
+  mediaType: MediaType,
+  lang: string
+): Promise<{ cast: string[]; directors: string[] }> {
   const url = `${BASE}/${mediaType}/${id}/credits?api_key=${API_KEY}&language=${lang}`;
   const res = await fetch(url);
-  if (!res.ok) return [];
+  if (!res.ok) return { cast: [], directors: [] };
   const data = await res.json();
   const cast = (data.cast || []) as TmdbCastMember[];
-  return cast.slice(0, 6).map((c) => c.name);
+  const crew = (data.crew || []) as TmdbCrewMember[];
+  return {
+    cast: cast.slice(0, 6).map((c) => c.name),
+    directors: crew.filter((c) => c.job === "Director").map((c) => c.name),
+  };
 }
 
 export interface FullMovieData {
@@ -135,6 +151,7 @@ export interface FullMovieData {
   genre: { ko: string[]; en: string[]; ja: string[] };
   overview: { ko: string; en: string; ja: string };
   casting: { ko: string; en: string; ja: string };
+  director: { ko: string; en: string; ja: string };
   voteAverage: number | null;
   posterKey: { ko: string | null; en: string | null; ja: string | null };
 }
@@ -143,13 +160,13 @@ export async function fetchFullMovieData(
   id: number,
   mediaType: MediaType
 ): Promise<FullMovieData> {
-  const [ko, en, ja, castKoArr, castEnArr, castJaArr] = await Promise.all([
+  const [ko, en, ja, credKo, credEn, credJa] = await Promise.all([
     getDetails(id, mediaType, "ko-KR"),
     getDetails(id, mediaType, "en-US"),
     getDetails(id, mediaType, "ja-JP"),
-    getCastNames(id, mediaType, "ko-KR"),
-    getCastNames(id, mediaType, "en-US"),
-    getCastNames(id, mediaType, "ja-JP"),
+    getCredits(id, mediaType, "ko-KR"),
+    getCredits(id, mediaType, "en-US"),
+    getCredits(id, mediaType, "ja-JP"),
   ]);
 
   const titleOf = (d: TmdbDetails) => (mediaType === "movie" ? d.title : d.name) || "";
@@ -166,9 +183,22 @@ export async function fetchFullMovieData(
   const rawCountry = countriesOf(ko)[0] || countriesOf(en)[0] || "";
   const country = normalizeCountry(rawCountry);
 
-  const castKo = castKoArr.join(", ");
-  const castEn = castEnArr.join(", ");
-  const castJa = castJaArr.join(", ");
+  const castKo = credKo.cast.join(", ");
+  const castEn = credEn.cast.join(", ");
+  const castJa = credJa.cast.join(", ");
+
+  // TMDb rarely lists a "Director" crew credit for TV series (it's a per-episode
+  // credit there), so fall back to created_by (the show's credited creator(s)).
+  const directorsOf = (cred: { directors: string[] }, d: TmdbDetails): string => {
+    if (cred.directors.length > 0) return cred.directors.join(", ");
+    if (mediaType === "tv" && d.created_by && d.created_by.length > 0) {
+      return d.created_by.map((c) => c.name).join(", ");
+    }
+    return "";
+  };
+  const directorKo = directorsOf(credKo, ko);
+  const directorEn = directorsOf(credEn, en);
+  const directorJa = directorsOf(credJa, ja);
 
   return {
     tmdbId: id,
@@ -188,6 +218,11 @@ export async function fetchFullMovieData(
       ko: castKo || castEn || castJa,
       en: castEn || castKo || castJa,
       ja: castJa || castEn || castKo,
+    },
+    director: {
+      ko: directorKo || directorEn || directorJa,
+      en: directorEn || directorKo || directorJa,
+      ja: directorJa || directorEn || directorKo,
     },
     voteAverage: ko.vote_average ?? en.vote_average ?? null,
     posterKey: {

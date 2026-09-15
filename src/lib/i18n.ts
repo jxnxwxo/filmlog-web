@@ -21,6 +21,7 @@ export interface I18nStrings {
   listHeadTitle: string;
   listHeadYear: string;
   listHeadGenre: string;
+  listHeadDirector: string;
   listHeadCast: string;
   listHeadGrade: string;
   shownSuffix: string;
@@ -29,6 +30,7 @@ export interface I18nStrings {
   footSuffix: string;
   myRating: string;
   castLabel: string;
+  directorLabel: string;
   unrated: string;
   noInfo: string;
   noOverview: string;
@@ -58,6 +60,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     listHeadTitle: "제목",
     listHeadYear: "연도 · 국가",
     listHeadGenre: "장르",
+    listHeadDirector: "감독",
     listHeadCast: "배우",
     listHeadGrade: "평점",
     shownSuffix: "편 표시 중",
@@ -66,6 +69,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     footSuffix: "건",
     myRating: "내 평점",
     castLabel: "출연",
+    directorLabel: "감독",
     unrated: "미평가",
     noInfo: "정보 없음",
     noOverview: "줄거리 정보가 없습니다.",
@@ -93,6 +97,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     listHeadTitle: "Title",
     listHeadYear: "Year · Country",
     listHeadGenre: "Genre",
+    listHeadDirector: "Director",
     listHeadCast: "Cast",
     listHeadGrade: "Rating",
     shownSuffix: " shown",
@@ -101,6 +106,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     footSuffix: "",
     myRating: "My Rating",
     castLabel: "Cast",
+    directorLabel: "Director",
     unrated: "Unrated",
     noInfo: "No info",
     noOverview: "No synopsis available.",
@@ -128,6 +134,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     listHeadTitle: "タイトル",
     listHeadYear: "年・国",
     listHeadGenre: "ジャンル",
+    listHeadDirector: "監督",
     listHeadCast: "出演者",
     listHeadGrade: "評価",
     shownSuffix: "件表示中",
@@ -136,6 +143,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     footSuffix: "件",
     myRating: "自己評価",
     castLabel: "出演",
+    directorLabel: "監督",
     unrated: "未評価",
     noInfo: "情報なし",
     noOverview: "あらすじ情報がありません。",
@@ -156,6 +164,7 @@ export interface Movie {
   genre: { ko: string[]; en: string[]; ja: string[] };
   grade: number | string | null;
   casting: { ko: string; en: string; ja: string };
+  director: { ko: string; en: string; ja: string };
   castSearch: string;
   overview: { ko: string; en: string; ja: string };
   voteAverage: number | string | null;
@@ -182,6 +191,9 @@ export function getCountry(item: Movie, lang: Lang): string {
 }
 export function getCasting(item: Movie, lang: Lang): string {
   return item.casting?.[lang] || "";
+}
+export function getDirector(item: Movie, lang: Lang): string {
+  return item.director?.[lang] || "";
 }
 export function getTopCast(item: Movie, lang: Lang, n: number = 2): string {
   const full = getCasting(item, lang);

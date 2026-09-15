@@ -324,7 +324,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, .poster-card:fo
 /* ---------- Text list view ---------- */
 .list-head, .list-row {
   display: grid;
-  grid-template-columns: 1.7fr 0.85fr 1.05fr 1.2fr 0.55fr 1.3fr;
+  grid-template-columns: 1.7fr 0.85fr 1fr 0.95fr 1fr 0.5fr 1.1fr;
   gap: var(--space-12);
   align-items: center;
 }
@@ -353,6 +353,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, .poster-card:fo
 .row-title-en { font-size: var(--text-caption); color: var(--text-faint); font-style: italic; margin-top: var(--space-4); }
 .row-meta { font-family: var(--font-body); font-size: var(--text-caption); color: var(--text-dim); }
 .row-genre { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+.row-director { font-size: var(--text-caption); color: var(--text-dim); }
 .row-cast { font-size: var(--text-caption); color: var(--text-dim); }
 .row-comment { font-size: var(--text-caption); color: var(--text-dim); font-style: italic; }
 .row-grade { font-family: var(--font-body); font-size: var(--text-body-sm); font-weight: 600; color: var(--accent-text); }
@@ -362,6 +363,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, .poster-card:fo
   .list-head { display: none; }
   .list-row { grid-template-columns: 1fr; gap: var(--space-4); padding: var(--space-16) var(--space-8); position: relative; }
   .row-grade { position: absolute; top: var(--space-16); right: var(--space-8); }
+  .row-director::before { content: "🎬 "; }
   .row-cast::before { content: "🎭 "; }
   .row-comment:not(:empty)::before { content: "💬 "; font-style: normal; }
 }
@@ -454,6 +456,7 @@ footer.note {
 .modal-note .label { font-family: var(--font-body); font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); display: block; margin-bottom: var(--space-4); }
 .modal-note p { margin: 0; font-size: var(--text-body-sm); color: var(--text); line-height: 1.6; }
 .modal-cast { font-size: var(--text-body-sm); color: var(--text-dim); }
+.modal-cast + .modal-cast { margin-top: var(--space-8); }
 .modal-cast .label { font-family: var(--font-body); font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); display: block; margin-bottom: var(--space-4); }
 .modal-admin {
   margin-top: var(--space-16);

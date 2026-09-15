@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS movies (
   genre JSONB,
   grade NUMERIC,
   casting JSONB,
+  director JSONB,
   cast_search TEXT,
   overview JSONB,
   vote_average NUMERIC,

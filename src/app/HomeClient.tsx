@@ -12,6 +12,7 @@ import {
   getOverview,
   getCountry,
   getCasting,
+  getDirector,
   getTopCast,
   posterUrl,
 } from "@/lib/i18n";
@@ -292,6 +293,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
               <div>{t.listHeadTitle}</div>
               <div>{t.listHeadYear}</div>
               <div>{t.listHeadGenre}</div>
+              <div>{t.listHeadDirector}</div>
               <div>{t.listHeadCast}</div>
               <div>{sort === "tmdb-desc" ? "TMDB" : t.listHeadGrade}</div>
               <div>{t.myNote}</div>
@@ -382,6 +384,7 @@ function ListRow({
             </span>
           ))}
       </div>
+      <div className="row-director">{getDirector(item, lang) || "—"}</div>
       <div className="row-cast">{getTopCast(item, lang) || "—"}</div>
       {grade ? <span className="row-grade">★ {grade}</span> : <span className="row-grade empty">{t.unrated}</span>}
       <div className="row-comment">{item.comment || ""}</div>
@@ -525,6 +528,10 @@ function MovieModal({
               <p>{item.comment}</p>
             </div>
           )}
+          <div className="modal-cast">
+            <span className="label">{t.directorLabel}</span>
+            <span>{getDirector(item, lang) || t.noInfo}</span>
+          </div>
           <div className="modal-cast">
             <span className="label">{t.castLabel}</span>
             <span>{getCasting(item, lang) || t.noInfo}</span>

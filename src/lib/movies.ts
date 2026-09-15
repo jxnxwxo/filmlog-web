@@ -11,6 +11,7 @@ interface MovieRow {
   genre: Movie["genre"];
   grade: string | null;
   casting: Movie["casting"];
+  director: Movie["director"] | null;
   cast_search: string;
   overview: Movie["overview"];
   vote_average: string | null;
@@ -24,7 +25,7 @@ interface MovieRow {
 export async function getAllMovies(): Promise<Movie[]> {
   const rows = await query<MovieRow>(
     `SELECT id, title_kr, title_en, title_ja, year, country, genre, grade,
-            casting, cast_search, overview, vote_average, poster_key, comment,
+            casting, director, cast_search, overview, vote_average, poster_key, comment,
             category, tmdb_id, media_type
      FROM movies
      ORDER BY title_kr`
@@ -40,6 +41,7 @@ export async function getAllMovies(): Promise<Movie[]> {
     genre: r.genre,
     grade: r.grade,
     casting: r.casting,
+    director: r.director || { ko: "", en: "", ja: "" },
     castSearch: r.cast_search,
     overview: r.overview,
     voteAverage: r.vote_average,

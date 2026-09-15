@@ -38,9 +38,9 @@ export async function POST(req: NextRequest) {
 
   const rows = await query<{ id: number }>(
     `INSERT INTO movies
-       (title_kr, title_en, title_ja, year, country, genre, grade, casting,
+       (title_kr, title_en, title_ja, year, country, genre, grade, casting, director,
         cast_search, overview, vote_average, poster_key, comment, category, tmdb_id, media_type)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
      RETURNING id`,
     [
       data.titleKr,
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
       JSON.stringify(data.genre),
       grade,
       JSON.stringify(data.casting),
+      JSON.stringify(data.director),
       castSearch,
       JSON.stringify(data.overview),
       data.voteAverage,
