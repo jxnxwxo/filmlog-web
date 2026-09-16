@@ -713,11 +713,7 @@ function MovieModal({
               <span>{t.noInfo}</span>
             )}
           </div>
-          <p className="person-note">
-            {t.personFilterNote1}
-            <br />
-            {t.personFilterNote2}
-          </p>
+          <p className="person-note">{t.personFilterNote}</p>
 
           {isAdmin && (
             <div className="modal-admin">

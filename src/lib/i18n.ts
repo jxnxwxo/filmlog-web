@@ -41,8 +41,7 @@ export interface I18nStrings {
   myNote: string;
   adminPanel: string;
   logout: string;
-  personFilterNote1: string;
-  personFilterNote2: string;
+  personFilterNote: string;
   ratingFilterLabel: string;
   clearFilter: string;
   exportCsv: string;
@@ -88,8 +87,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     myNote: "한줄평",
     adminPanel: "관리자 화면",
     logout: "로그아웃",
-    personFilterNote1: "이름을 누르면 해당 인물의 작품으로 검색돼요",
-    personFilterNote2: "단, 내가 본 작품 중에서만 필터링돼요.",
+    personFilterNote: "이름을 클릭하면 해당 인물의 작품으로 검색돼요.",
     ratingFilterLabel: "평점 필터",
     clearFilter: "초기화",
     exportCsv: "CSV 내보내기",
@@ -133,8 +131,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     myNote: "My Note",
     adminPanel: "Admin Panel",
     logout: "Log out",
-    personFilterNote1: "Tap a name to search for that person's work",
-    personFilterNote2: "Though only within what I've watched.",
+    personFilterNote: "Click a name to search that person's work.",
     ratingFilterLabel: "Rating Filter",
     clearFilter: "Clear",
     exportCsv: "Export CSV",
@@ -178,8 +175,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     myNote: "ひとこと感想",
     adminPanel: "管理画面",
     logout: "ログアウト",
-    personFilterNote1: "名前を押すとその人物の作品で検索されます",
-    personFilterNote2: "ただし、私が見た作品の中だけです。",
+    personFilterNote: "名前をクリックすると、その人物の作品で検索されます。",
     ratingFilterLabel: "評価フィルター",
     clearFilter: "リセット",
     exportCsv: "CSVエクスポート",

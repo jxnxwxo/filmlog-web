@@ -59,10 +59,10 @@ export default function AdminPage() {
     <div className="admin-wrap">
       <div className="admin-card">
         <Link href="/" className="admin-link" style={{ marginBottom: 20, display: "inline-block" }}>
-          ← 필름로그로 돌아가기
+          ← 뒤로
         </Link>
         <h1>관리자</h1>
-        <p className="sub">TMDb에서 검색해 새 영화·드라마를 추가하거나, 기존 평점·한줄평을 고칩니다.</p>
+        <p className="sub">새 영화·드라마를 추가하거나, 평점·한줄평을 수정합니다.</p>
 
         {!isAdmin ? (
           <form onSubmit={login}>
@@ -76,7 +76,7 @@ export default function AdminPage() {
                 autoFocus
               />
             </div>
-            <button className="btn" type="submit">
+            <button className="btn small" type="submit">
               로그인
             </button>
           </form>

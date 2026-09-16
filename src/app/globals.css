@@ -564,7 +564,7 @@ footer.note {
   cursor: pointer;
 }
 .person-tag:hover { text-decoration: underline; }
-.person-note { margin: var(--space-8) 0 0; font-size: var(--text-caption); color: var(--text-faint); }
+.person-note { margin: var(--space-8) 0 0; font-size: 11px; color: var(--text-faint); } /* one step below DESIGN.md's smallest named size (caption, 12px) — this is a minor auxiliary hint, not part of the type scale's content hierarchy */
 .modal-admin {
   margin-top: var(--space-16);
   padding-top: var(--space-16);
@@ -682,6 +682,7 @@ footer.note {
 .btn.secondary { background: transparent; color: var(--accent-text); border: 1px solid var(--accent-text); }
 /* DESIGN.md has no destructive/red token; reusing Onyx (true black) for maximum contrast instead of inventing a color */
 .btn.danger { background: #000000; color: var(--surface); }
+.btn.small { font-size: var(--text-body-sm); padding: var(--space-8) var(--space-12); }
 .msg { font-size: var(--text-body-sm); padding: var(--space-8) var(--space-12); border-radius: var(--radius-card); margin-bottom: var(--space-16); }
 /* DESIGN.md defines no semantic error/success color; reusing Onyx for error (max contrast/urgency) and Link Blue for success (positive emphasis) on a neutral surface */
 .msg.error { background: var(--surface-2); color: #000000; }
