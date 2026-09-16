@@ -16,10 +16,15 @@
   /* DESIGN.md Tokens — Shadows > xl (--shadow-xl); Elevation Philosophy reserves this for product/poster imagery only, never cards or buttons */
   --shadow-xl: rgba(0, 0, 0, 0.22) 3px 5px 30px 0px;
 
-  /* DESIGN.md Tokens — Colors > Apple Blue (--color-apple-blue): filled buttons + selected/active states only (DO #1) */
-  --accent: #0071e3;
-  /* DESIGN.md Tokens — Colors > Link Blue (--color-link-blue): inline links / emphasis text (Ghost Link component) — Apple Blue itself is never text (DON'T) */
-  --accent-text: #0066cc;
+  /* Unified with dark mode's gold accent (user request) instead of DESIGN.md's Apple Blue —
+     filled buttons + selected/active states */
+  --accent: #dfae57;
+  /* Darker amber so text/borders using this stay readable on the light canvas — the dark-mode
+     value (#f6e2b0) is a pale cream tuned for a dark background and would wash out here */
+  --accent-text: #8a5f1e;
+  /* Text color for content sitting on top of an --accent fill: dark in both themes, since
+     the gold accent itself is light/bright in both */
+  --on-accent: #1d1d1f;
 
   /* DESIGN.md Typography > SF Pro Display, Substitute: "Inter, system-ui" */
   --font-display: 'Inter', system-ui, sans-serif;
@@ -74,6 +79,7 @@
 
     --accent: #dfae57;
     --accent-text: #f6e2b0;
+    --on-accent: #1d1c22;
   }
 }
 :root[data-theme="dark"] {
@@ -88,6 +94,7 @@
 
   --accent: #dfae57;
   --accent-text: #f6e2b0;
+  --on-accent: #1d1c22;
 }
 
 * { box-sizing: border-box; }
@@ -100,7 +107,7 @@ body {
   font-size: var(--text-body-sm); /* DESIGN.md Type Scale > body-sm */
   line-height: 1.6;
 }
-::selection { background: var(--accent); color: var(--surface); }
+::selection { background: var(--accent); color: var(--on-accent); }
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
@@ -210,8 +217,8 @@ body {
   transition: background .15s ease, color .15s ease;
   white-space: nowrap;
 }
-/* DO #1: #0071e3 only for filled action buttons and selected/active states */
-.segmented button.active { background: var(--accent); color: var(--surface); }
+/* Selected/active state uses the accent fill */
+.segmented button.active { background: var(--accent); color: var(--on-accent); }
 .segmented button .n { opacity: .65; font-weight: 400; font-size: var(--text-caption); margin-left: var(--space-4); }
 
 .lang-segmented button { padding: var(--space-8) var(--space-12); font-size: 16px; line-height: 1; }
@@ -228,7 +235,7 @@ body {
   overflow: hidden;
   scroll-margin-top: var(--space-12);
 }
-.search-box:focus-within { border-color: var(--accent); } /* DESIGN.md Form Input: focus ring in #0071e3 */
+.search-box:focus-within { border-color: var(--accent); } /* focus ring uses the accent color */
 .search-scope { display: flex; flex-shrink: 0; border-right: 1px solid var(--border); }
 .search-scope button {
   padding: var(--space-8) var(--space-12);
@@ -353,7 +360,7 @@ body {
 .export-btn:hover { color: var(--text); border-color: var(--text-dim); }
 .export-btn svg { width: 14px; height: 14px; }
 
-/* DESIGN.md Form Input: "Focus ring in #0071e3 at 2px" */
+/* Focus ring uses the accent color at 2px */
 button:focus-visible, input:focus-visible, select:focus-visible, .poster-card:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -539,7 +546,7 @@ footer.note {
 .rating-box { background: var(--surface-2); border-radius: var(--radius-card); padding: var(--space-8) var(--space-12); }
 .rating-box .label { font-family: var(--font-body); font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
 .rating-box .value { font-family: var(--font-body); font-size: var(--text-subheading); font-weight: 600; margin-top: var(--space-4); color: var(--text); }
-.rating-box.mine .value { color: var(--accent-text); } /* DESIGN.md Link Blue: emphasis text, never Apple Blue for text */
+.rating-box.mine .value { color: var(--accent-text); } /* darker gold for text (--accent is the fill color) */
 .modal-genres { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-bottom: var(--space-16); }
 .modal-overview { font-size: var(--text-body-sm); letter-spacing: var(--tracking-body-sm); line-height: 1.5; color: var(--text-dim); margin-bottom: var(--space-16); } /* DESIGN.md Type Scale: dropped one step from body (17px) to body-sm (14px) */
 .modal-note {
@@ -561,7 +568,7 @@ footer.note {
   margin: 0;
   font: inherit;
   font-size: var(--text-body-sm);
-  color: var(--accent-text); /* DESIGN.md Link Blue: inline text link, never Apple Blue for text */
+  color: var(--accent-text); /* inline text link — darker gold for readability, not the fill color */
   cursor: pointer;
 }
 .person-tag:hover { text-decoration: underline; }
@@ -665,8 +672,8 @@ footer.note {
   font-size: var(--text-body-sm);
   outline: none;
 }
-.field input:focus, .field select:focus { border-color: var(--accent); } /* DESIGN.md Form Input: focus ring in #0071e3 */
-/* DESIGN.md Filled Pill Button: 980px radius, #0071e3 bg, white(#f4f8fb) text 17px/400, padding 11px 15px, no border/shadow */
+.field input:focus, .field select:focus { border-color: var(--accent); } /* focus ring uses the accent color */
+/* Filled pill button: gold accent fill, dark text (--on-accent) since the fill is light */
 .btn {
   font-family: var(--font-body);
   font-weight: 400;
@@ -675,17 +682,18 @@ footer.note {
   border-radius: var(--radius-pill);
   border: none;
   background: var(--accent);
-  color: var(--surface);
+  color: var(--on-accent);
   cursor: pointer;
 }
 .btn:disabled { opacity: 0.5; cursor: default; }
-/* DESIGN.md Outlined Pill Button: 980px radius, 1px #0066cc border, #0066cc text, transparent fill — "used as the second action next to a filled blue button" */
+/* Outlined pill button: transparent fill, gold-text border — the second action next to a filled one */
 .btn.secondary { background: transparent; color: var(--accent-text); border: 1px solid var(--accent-text); }
-/* DESIGN.md has no destructive/red token; reusing Onyx (true black) for maximum contrast instead of inventing a color */
-.btn.danger { background: #000000; color: var(--surface); }
+/* Always-black fill for destructive actions; text is a fixed white rather than --surface since
+   --surface is dark in dark mode and would put dark text on the black background */
+.btn.danger { background: #000000; color: #fff; }
 .btn.small { font-size: var(--text-body-sm); padding: var(--space-8) var(--space-12); }
 .msg { font-size: var(--text-body-sm); padding: var(--space-8) var(--space-12); border-radius: var(--radius-card); margin-bottom: var(--space-16); }
-/* DESIGN.md defines no semantic error/success color; reusing Onyx for error (max contrast/urgency) and Link Blue for success (positive emphasis) on a neutral surface */
+/* No dedicated semantic error/success color; reusing Onyx for error (max contrast/urgency) and the accent-text gold for success (positive emphasis) on a neutral surface */
 .msg.error { background: var(--surface-2); color: #000000; }
 .msg.success { background: var(--surface-2); color: var(--accent-text); }
 .search-results { display: flex; flex-direction: column; gap: var(--space-8); margin: var(--space-12) 0 var(--space-20); max-height: 320px; overflow-y: auto; }
