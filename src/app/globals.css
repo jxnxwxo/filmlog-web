@@ -254,35 +254,12 @@ body {
   outline: none;
 }
 
-.sort-box { position: relative; flex: 0 0 172px; }
-.sort-box select {
-  width: 100%;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: var(--radius-card); /* DESIGN.md Border Radius > inputs */
-  padding: var(--space-8) 30px var(--space-8) var(--space-12);
-  font-family: var(--font-body);
-  font-size: var(--text-body-sm);
-  outline: none;
-  cursor: pointer;
-}
-.sort-box svg {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 14px;
-  height: 14px;
-  stroke: var(--text-faint);
-  pointer-events: none;
-}
-
-.rating-filter { position: relative; flex-shrink: 0; }
-.rating-filter-trigger {
+/* Shared dropdown pattern used by both the sort control and the rating filter,
+   so they render with identical size/font instead of a native <select> (which
+   iOS forces to 16px to avoid its zoom-on-focus behavior) looking mismatched
+   next to a custom button. */
+.filter-dropdown { position: relative; flex-shrink: 0; }
+.filter-dropdown-trigger {
   display: flex;
   align-items: center;
   gap: var(--space-4);
@@ -296,22 +273,37 @@ body {
   cursor: pointer;
   white-space: nowrap;
 }
-.rating-filter-trigger svg { width: 14px; height: 14px; stroke: var(--text-faint); }
-.rating-filter-panel {
+.filter-dropdown-trigger svg { width: 14px; height: 14px; stroke: var(--text-faint); flex-shrink: 0; }
+.filter-dropdown-panel {
   position: absolute;
   top: calc(100% + var(--space-8));
   right: 0;
-  z-index: 25;
+  z-index: 40;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   padding: var(--space-12);
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: var(--space-4) var(--space-16);
   min-width: 180px;
 }
-.rating-filter-option {
+.rating-panel { display: grid; grid-template-columns: repeat(2, auto); gap: var(--space-4) var(--space-16); }
+.sort-panel { display: flex; flex-direction: column; gap: 2px; min-width: 170px; }
+.filter-dropdown-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-8);
+  border-radius: var(--radius-card);
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--text-dim);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.filter-dropdown-option:hover { background: var(--surface-2); }
+.filter-dropdown-option.active { background: var(--surface-2); color: var(--text); font-weight: 600; }
+.filter-dropdown-checkbox {
   display: flex;
   align-items: center;
   gap: var(--space-8);
@@ -320,8 +312,8 @@ body {
   cursor: pointer;
   white-space: nowrap;
 }
-.rating-filter-option input { accent-color: var(--accent); cursor: pointer; }
-.rating-filter-clear {
+.filter-dropdown-checkbox input { accent-color: var(--accent); cursor: pointer; }
+.filter-dropdown-clear {
   grid-column: 1 / -1;
   margin-top: var(--space-8);
   padding-top: var(--space-8);
@@ -334,7 +326,14 @@ body {
   font-size: var(--text-caption);
   cursor: pointer;
   text-align: center;
+  width: 100%;
 }
+
+/* Transparent full-screen catcher behind an open dropdown so a tap anywhere
+   else (including a movie row that visually sits close to the panel on a
+   short phone viewport) closes the dropdown instead of reaching the page
+   underneath it. */
+.dropdown-scrim { position: fixed; inset: 0; z-index: 39; background: transparent; }
 
 .export-btn {
   display: flex;
@@ -600,19 +599,24 @@ footer.note {
   .controls-inner { gap: var(--space-8); }
   .segmented { width: auto; }
   .search-box { flex-basis: 100%; }
-  .category-segmented, .country-segmented, .sort-box, .rating-filter, .view-segmented, .export-btn {
+  .category-segmented, .country-segmented, .filter-dropdown, .view-segmented, .export-btn {
     flex: 1 1 calc(50% - var(--space-4));
     min-width: 0;
   }
   .category-segmented button, .country-segmented button, .view-segmented button { flex: 1 1 0; min-width: 0; }
-  .category-segmented button, .country-segmented button {
+  .category-segmented button, .country-segmented button, .view-segmented button {
     padding: 6px 4px;
     font-size: 13px;
   }
   .category-segmented .n { margin-left: 2px; }
   .export-btn { justify-content: center; }
-  .rating-filter-trigger { width: 100%; justify-content: center; }
+  .filter-dropdown-trigger { width: 100%; justify-content: center; }
+
+  /* iOS Safari zooms the page on focus for any text input/select under 16px, so those
+     keep a real 16px font; a visual scale brings the on-screen size back down to match
+     the surrounding buttons (e.g. the rating-filter trigger) without re-triggering zoom. */
   input, select, textarea { font-size: 16px !important; }
+  .search-box input { transform: scale(0.875); transform-origin: left center; }
 }
 
 /* ---------- Admin page ---------- */

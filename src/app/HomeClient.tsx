@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   I18N,
@@ -32,6 +32,14 @@ type ViewMode = "text" | "poster";
 type SortMode = "title" | "year-desc" | "year-asc" | "grade-desc" | "tmdb-desc";
 
 const RATING_OPTIONS = [5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5];
+
+const SORT_OPTIONS: { value: SortMode; label: (t: (typeof I18N)["ko"]) => string }[] = [
+  { value: "title", label: (t) => t.sortTitle },
+  { value: "year-desc", label: (t) => t.sortYearDesc },
+  { value: "year-asc", label: (t) => t.sortYearAsc },
+  { value: "grade-desc", label: (t) => t.sortGradeDesc },
+  { value: "tmdb-desc", label: (t) => t.sortTmdbDesc },
+];
 
 function ChevronIcon() {
   return (
@@ -88,7 +96,7 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
   const [showTop, setShowTop] = useState(false);
   const [ratingFilter, setRatingFilter] = useState<Set<number>>(new Set());
   const [ratingPickerOpen, setRatingPickerOpen] = useState(false);
-  const ratingPickerRef = useRef<HTMLDivElement>(null);
+  const [sortPickerOpen, setSortPickerOpen] = useState(false);
 
   const t = I18N[lang];
 
@@ -125,17 +133,6 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
       return next;
     });
   }
-
-  useEffect(() => {
-    if (!ratingPickerOpen) return;
-    function onDocClick(e: MouseEvent) {
-      if (ratingPickerRef.current && !ratingPickerRef.current.contains(e.target as Node)) {
-        setRatingPickerOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [ratingPickerOpen]);
 
   function exportCsv() {
     const headers = ["제목", "영문제목", "연도", "국가", "장르", "감독", "배우", "카테고리", "내평점", "TMDB평점", "한줄평"];
@@ -344,32 +341,59 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
               onFocus={(e) => e.currentTarget.scrollIntoView({ behavior: "smooth", block: "start" })}
             />
           </div>
-          <div className="sort-box">
-            <select value={sort} onChange={(e) => setSort(e.target.value as SortMode)}>
-              <option value="title">{t.sortTitle}</option>
-              <option value="year-desc">{t.sortYearDesc}</option>
-              <option value="year-asc">{t.sortYearAsc}</option>
-              <option value="grade-desc">{t.sortGradeDesc}</option>
-              <option value="tmdb-desc">{t.sortTmdbDesc}</option>
-            </select>
-            <ChevronIcon />
+          <div className="filter-dropdown sort-filter">
+            <button
+              type="button"
+              className="filter-dropdown-trigger"
+              onClick={() => {
+                setSortPickerOpen((v) => !v);
+                setRatingPickerOpen(false);
+              }}
+            >
+              {SORT_OPTIONS.find((o) => o.value === sort)?.label(t)}
+              <ChevronIcon />
+            </button>
+            {sortPickerOpen && (
+              <div className="filter-dropdown-panel sort-panel">
+                {SORT_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={"filter-dropdown-option" + (sort === opt.value ? " active" : "")}
+                    onClick={() => {
+                      setSort(opt.value);
+                      setSortPickerOpen(false);
+                    }}
+                  >
+                    {opt.label(t)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="rating-filter" ref={ratingPickerRef}>
-            <button type="button" className="rating-filter-trigger" onClick={() => setRatingPickerOpen((v) => !v)}>
+          <div className="filter-dropdown rating-filter">
+            <button
+              type="button"
+              className="filter-dropdown-trigger"
+              onClick={() => {
+                setRatingPickerOpen((v) => !v);
+                setSortPickerOpen(false);
+              }}
+            >
               {t.ratingFilterLabel}
               {ratingFilter.size > 0 ? ` (${ratingFilter.size})` : ""}
               <ChevronIcon />
             </button>
             {ratingPickerOpen && (
-              <div className="rating-filter-panel">
+              <div className="filter-dropdown-panel rating-panel">
                 {RATING_OPTIONS.map((v) => (
-                  <label key={v} className="rating-filter-option">
+                  <label key={v} className="filter-dropdown-checkbox">
                     <input type="checkbox" checked={ratingFilter.has(v)} onChange={() => toggleRating(v)} />
                     ★ {v.toFixed(1)}
                   </label>
                 ))}
                 {ratingFilter.size > 0 && (
-                  <button type="button" className="rating-filter-clear" onClick={() => setRatingFilter(new Set())}>
+                  <button type="button" className="filter-dropdown-clear" onClick={() => setRatingFilter(new Set())}>
                     {t.clearFilter}
                   </button>
                 )}
@@ -390,6 +414,16 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
           </button>
         </div>
       </div>
+
+      {(ratingPickerOpen || sortPickerOpen) && (
+        <div
+          className="dropdown-scrim"
+          onClick={() => {
+            setRatingPickerOpen(false);
+            setSortPickerOpen(false);
+          }}
+        />
+      )}
 
       <div className="wrap">
         <div className="grid-meta">
