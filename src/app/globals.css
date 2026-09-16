@@ -594,7 +594,12 @@ footer.note {
   /* Stacked full-width rows made the controls bar too tall on a phone screen, so it's no
      longer pinned; pairing short controls two-to-a-row (category+country, sort+rating,
      view+export) gets the movie list visible sooner without a sticky bar. */
-  .controls { position: static; padding: var(--space-12) var(--space-16); }
+  /* Stays position:relative (not static) so its z-index keeps taking effect: .controls has
+     backdrop-filter, which creates its own stacking context, so an open dropdown panel
+     nested inside it needs .controls itself raised above the scrim/list — otherwise the
+     panel's own z-index is trapped inside that context and can't out-rank page content
+     that sits outside it. */
+  .controls { position: relative; z-index: 45; padding: var(--space-12) var(--space-16); }
   .wrap { padding: 0 var(--space-16) 60px; }
   .controls-inner { gap: var(--space-8); }
   .segmented { width: auto; }
