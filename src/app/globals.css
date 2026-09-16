@@ -402,8 +402,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, .poster-card:fo
   position: absolute;
   top: 7px;
   right: 7px;
-  background: rgba(29, 29, 31, 0.72); /* translucent Carbon */
-  color: var(--surface);
+  background: rgba(20, 20, 20, 0.78); /* fixed dark scrim, not theme-dependent: this badge
+    sits on top of arbitrary poster art, not the page background, so it needs guaranteed
+    contrast in both themes rather than following --surface (which is dark in dark mode
+    and made the text unreadable against dark posters) */
+  color: #fff;
   font-family: var(--font-body);
   font-size: var(--text-caption);
   font-weight: 600;
