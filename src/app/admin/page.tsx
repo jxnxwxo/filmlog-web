@@ -62,7 +62,7 @@ export default function AdminPage() {
           ← 뒤로
         </Link>
         <h1>관리자</h1>
-        <p className="sub">새 영화·드라마를 추가하거나, 평점·한줄평을 수정합니다.</p>
+        <p className="sub">새 작품을 추가하거나, 평점·한줄평을 수정합니다.</p>
 
         {!isAdmin ? (
           <form onSubmit={login}>

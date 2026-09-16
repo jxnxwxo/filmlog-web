@@ -448,6 +448,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, .poster-card:fo
 .row-title-en { font-size: var(--text-caption); color: var(--text-faint); font-style: italic; margin-top: var(--space-4); }
 .row-meta { font-family: var(--font-body); font-size: var(--text-caption); color: var(--text-dim); }
 .row-genre { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+.row-genre .pill { font-size: 11px; padding: 3px 6px; }
 .row-director { font-size: var(--text-caption); color: var(--text-dim); }
 .row-cast { font-size: var(--text-caption); color: var(--text-dim); }
 .row-comment { font-size: var(--text-caption); color: var(--text-dim); font-style: italic; }
@@ -564,7 +565,7 @@ footer.note {
   cursor: pointer;
 }
 .person-tag:hover { text-decoration: underline; }
-.person-note { margin: var(--space-8) 0 0; font-size: 11px; color: var(--text-faint); } /* one step below DESIGN.md's smallest named size (caption, 12px) — this is a minor auxiliary hint, not part of the type scale's content hierarchy */
+.person-note { margin: var(--space-8) 0 0; font-size: 10px; color: var(--text-faint); } /* below DESIGN.md's smallest named size (caption, 12px) — this is a minor auxiliary hint, not part of the type scale's content hierarchy */
 .modal-admin {
   margin-top: var(--space-16);
   padding-top: var(--space-16);
