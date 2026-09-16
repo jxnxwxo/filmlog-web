@@ -541,7 +541,7 @@ footer.note {
 .rating-box .value { font-family: var(--font-body); font-size: var(--text-subheading); font-weight: 600; margin-top: var(--space-4); color: var(--text); }
 .rating-box.mine .value { color: var(--accent-text); } /* DESIGN.md Link Blue: emphasis text, never Apple Blue for text */
 .modal-genres { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-bottom: var(--space-16); }
-.modal-overview { font-size: var(--text-body); letter-spacing: var(--tracking-body); line-height: 1.47; color: var(--text-dim); margin-bottom: var(--space-16); } /* DESIGN.md DO: body text at 17px, -0.016em tracking */
+.modal-overview { font-size: var(--text-body-sm); letter-spacing: var(--tracking-body-sm); line-height: 1.5; color: var(--text-dim); margin-bottom: var(--space-16); } /* DESIGN.md Type Scale: dropped one step from body (17px) to body-sm (14px) */
 .modal-note {
   /* DESIGN.md has no "highlight" token; reusing the Ice elevated-wash surface instead of a color fill */
   background: var(--surface);
@@ -565,7 +565,7 @@ footer.note {
   cursor: pointer;
 }
 .person-tag:hover { text-decoration: underline; }
-.person-note { margin: var(--space-8) 0 0; font-size: 10px; color: var(--text-faint); } /* below DESIGN.md's smallest named size (caption, 12px) — this is a minor auxiliary hint, not part of the type scale's content hierarchy */
+.person-note { margin: var(--space-8) 0 0; font-size: var(--text-caption); color: var(--text-faint); }
 .modal-admin {
   margin-top: var(--space-16);
   padding-top: var(--space-16);
