@@ -15,10 +15,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "tmdbId and mediaType are required" }, { status: 400 });
   }
 
-  const rows = await query<{ title_kr: string }>(
-    "SELECT title_kr FROM movies WHERE tmdb_id = $1 AND media_type = $2",
+  const rows = await query<{ id: number; title_kr: string; grade: string | null }>(
+    "SELECT id, title_kr, grade FROM movies WHERE tmdb_id = $1 AND media_type = $2",
     [tmdbId, mediaType]
   );
 
-  return NextResponse.json({ exists: rows.length > 0, titles: rows.map((r) => r.title_kr) });
+  return NextResponse.json({
+    exists: rows.length > 0,
+    titles: rows.map((r) => r.title_kr),
+    movie: rows[0] ? { id: rows[0].id, titleKr: rows[0].title_kr, grade: rows[0].grade } : null,
+  });
 }

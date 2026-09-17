@@ -18,6 +18,21 @@ interface SearchCandidate {
   overview: string;
 }
 
+interface ExistingMatch {
+  id: number;
+  titleKr: string;
+  grade: number | string | null;
+}
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="11" cy="11" r="7"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+  );
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
@@ -82,7 +97,7 @@ export default function AdminPage() {
           </form>
         ) : (
           <>
-            <button className="btn secondary" onClick={logout} style={{ marginBottom: 20 }}>
+            <button className="btn secondary small" onClick={logout} style={{ marginBottom: 20 }}>
               로그아웃
             </button>
             <AdminTabs />
@@ -120,6 +135,7 @@ function AddMovieForm() {
   const [category, setCategory] = useState<"movie" | "drama">("movie");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
+  const [existingMatch, setExistingMatch] = useState<ExistingMatch | null>(null);
 
   async function search(e: React.FormEvent) {
     e.preventDefault();
@@ -140,7 +156,17 @@ function AddMovieForm() {
     }
   }
 
-  const [confirmText, setConfirmText] = useState<string | null>(null);
+  function selectCandidate(r: SearchCandidate) {
+    setSelected(r);
+    setGrade(null);
+    setComment("");
+    setMessage(null);
+  }
+
+  function unselect() {
+    setSelected(null);
+    setMessage(null);
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -152,8 +178,8 @@ function AddMovieForm() {
         `/api/admin/check?tmdbId=${selected.id}&mediaType=${selected.mediaType}`
       );
       const checkData = await checkRes.json();
-      if (checkData.exists) {
-        setConfirmText(`이미 존재하는 작품입니다 (${checkData.titles.join(", ")}). 그래도 추가하시겠습니까?`);
+      if (checkData.exists && checkData.movie) {
+        setExistingMatch(checkData.movie);
         setSubmitting(false);
         return;
       }
@@ -181,7 +207,7 @@ function AddMovieForm() {
       });
       const data = await res.json();
       if (res.ok) {
-        setMessage({ type: "success", text: `"${data.title}" 추가 완료!` });
+        setMessage({ type: "success", text: `"${data.title}" 추가 완료! (평점 ${grade ?? "미평가"})` });
         setSelected(null);
         setResults([]);
         setQuery("");
@@ -192,7 +218,34 @@ function AddMovieForm() {
       }
     } finally {
       setSubmitting(false);
-      setConfirmText(null);
+      setExistingMatch(null);
+    }
+  }
+
+  async function doUpdateExisting() {
+    if (!existingMatch) return;
+    setSubmitting(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/admin/edit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: existingMatch.id, grade, comment }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMessage({ type: "success", text: `"${data.title}" 업데이트 완료! (평점 ${grade ?? "미평가"})` });
+        setSelected(null);
+        setResults([]);
+        setQuery("");
+        setGrade(null);
+        setComment("");
+      } else {
+        setMessage({ type: "error", text: data.error || "업데이트에 실패했습니다." });
+      }
+    } finally {
+      setSubmitting(false);
+      setExistingMatch(null);
     }
   }
 
@@ -201,25 +254,27 @@ function AddMovieForm() {
       <form onSubmit={search}>
         <div className="field">
           <label>제목으로 검색</label>
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="예: 인터스텔라, Inception…"
-          />
+          <div className="input-with-button">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="예: 인터스텔라, Inception…"
+            />
+            <button type="submit" aria-label="검색" disabled={searching}>
+              <SearchIcon />
+            </button>
+          </div>
         </div>
-        <button className="btn" type="submit" disabled={searching}>
-          {searching ? "검색 중…" : "TMDb 검색"}
-        </button>
       </form>
 
-      {results.length > 0 && (
+      {!selected && results.length > 0 && (
         <div className="search-results">
           {results.map((r) => (
             <button
               key={`${r.mediaType}-${r.id}`}
-              className={"search-result" + (selected?.id === r.id && selected?.mediaType === r.mediaType ? " selected" : "")}
-              onClick={() => setSelected(r)}
+              className="search-result"
+              onClick={() => selectCandidate(r)}
               type="button"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -244,8 +299,22 @@ function AddMovieForm() {
           {message && <div className={"msg " + message.type}>{message.text}</div>}
           <div className="field">
             <label>선택한 작품</label>
-            <div style={{ fontSize: 14, padding: "8px 0" }}>
-              {selected.title} ({selected.year})
+            <div className="search-result selected" style={{ cursor: "default" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {selected.posterPath ? (
+                <img src={`https://image.tmdb.org/t/p/w92${selected.posterPath}`} alt="" />
+              ) : (
+                <div style={{ width: 40, height: 60, background: "var(--surface-2)", borderRadius: 4 }} />
+              )}
+              <div className="info">
+                <div className="t">{selected.title}</div>
+                <div className="y">
+                  {selected.year} · {selected.mediaType === "movie" ? "영화" : "TV"}
+                </div>
+              </div>
+              <button type="button" className="unselect-btn" onClick={unselect} aria-label="선택 취소">
+                ✕
+              </button>
             </div>
           </div>
           <div className="field">
@@ -270,7 +339,7 @@ function AddMovieForm() {
             />
           </div>
           <button className="btn" type="submit" disabled={submitting}>
-            {submitting ? "추가 중…" : "필름로그에 추가"}
+            {submitting ? "추가 중…" : "추가"}
           </button>
         </form>
       )}
@@ -279,12 +348,14 @@ function AddMovieForm() {
         <div className="msg success">{message.text}</div>
       )}
 
-      {confirmText && (
+      {existingMatch && (
         <ConfirmDialog
-          message={confirmText}
-          confirmLabel="추가"
-          onConfirm={doAdd}
-          onCancel={() => setConfirmText(null)}
+          message={`${existingMatch.titleKr} (평점 ${
+            existingMatch.grade != null ? Number(existingMatch.grade).toFixed(1) : "미평가"
+          })\n이미 존재하는 작품입니다. 새로 업데이트할까요?`}
+          confirmLabel="업데이트"
+          onConfirm={doUpdateExisting}
+          onCancel={() => setExistingMatch(null)}
         />
       )}
     </>
@@ -338,7 +409,7 @@ function EditMovieSection() {
       });
       const data = await res.json();
       if (res.ok) {
-        setMessage({ type: "success", text: `"${data.title}" 수정 완료!` });
+        setMessage({ type: "success", text: `"${data.title}" 수정 완료! (평점 ${grade ?? "미평가"})` });
         setEditing(null);
         setQuery("");
         loadMovies();
@@ -404,10 +475,10 @@ function EditMovieSection() {
             />
           </div>
           <div style={{ display: "flex", gap: 10 }}>
-            <button className="btn" type="submit" disabled={saving}>
+            <button className="btn small" type="submit" disabled={saving}>
               {saving ? "저장 중…" : "저장"}
             </button>
-            <button className="btn secondary" type="button" onClick={() => setEditing(null)}>
+            <button className="btn secondary small" type="button" onClick={() => setEditing(null)}>
               취소
             </button>
           </div>

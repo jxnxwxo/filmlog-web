@@ -45,6 +45,8 @@ export interface I18nStrings {
   ratingFilterLabel: string;
   clearFilter: string;
   exportCsv: string;
+  showOverview: string;
+  hideOverview: string;
 }
 
 export const I18N: Record<Lang, I18nStrings> = {
@@ -91,6 +93,8 @@ export const I18N: Record<Lang, I18nStrings> = {
     ratingFilterLabel: "평점 필터",
     clearFilter: "초기화",
     exportCsv: "CSV 내보내기",
+    showOverview: "줄거리 보기",
+    hideOverview: "줄거리 닫기",
   },
   en: {
     siteTitle: "FILM & DRAMA ARCHIVE",
@@ -135,6 +139,8 @@ export const I18N: Record<Lang, I18nStrings> = {
     ratingFilterLabel: "Rating Filter",
     clearFilter: "Clear",
     exportCsv: "Export CSV",
+    showOverview: "Show synopsis",
+    hideOverview: "Hide synopsis",
   },
   ja: {
     siteTitle: "FILM & DRAMA ARCHIVE",
@@ -179,6 +185,8 @@ export const I18N: Record<Lang, I18nStrings> = {
     ratingFilterLabel: "評価フィルター",
     clearFilter: "リセット",
     exportCsv: "CSVエクスポート",
+    showOverview: "あらすじを見る",
+    hideOverview: "あらすじを閉じる",
   },
 };
 

@@ -603,6 +603,7 @@ function MovieModal({
   const [editComment, setEditComment] = useState(item.comment || "");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showOverview, setShowOverview] = useState(false);
 
   async function saveEdit() {
     setSaving(true);
@@ -690,7 +691,17 @@ function MovieModal({
               </span>
             ))}
           </div>
-          <div className="modal-overview">{getOverview(item, lang) || t.noOverview}</div>
+          <button
+            type="button"
+            className="overview-toggle"
+            onClick={() => setShowOverview((v) => !v)}
+          >
+            {showOverview ? t.hideOverview : t.showOverview}
+            <span className={"overview-toggle-chevron" + (showOverview ? " open" : "")}>
+              <ChevronIcon />
+            </span>
+          </button>
+          {showOverview && <div className="modal-overview">{getOverview(item, lang) || t.noOverview}</div>}
           {item.comment && (
             <div className="modal-note">
               <span className="label">{t.myNote}</span>

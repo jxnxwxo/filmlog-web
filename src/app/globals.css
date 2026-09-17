@@ -548,6 +548,22 @@ footer.note {
 .rating-box .value { font-family: var(--font-body); font-size: var(--text-subheading); font-weight: 600; margin-top: var(--space-4); color: var(--text); }
 .rating-box.mine .value { color: var(--accent-text); } /* darker gold for text (--accent is the fill color) */
 .modal-genres { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-bottom: var(--space-16); }
+.overview-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-16);
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  color: var(--accent-text);
+  cursor: pointer;
+}
+.overview-toggle-chevron { display: flex; width: 12px; height: 12px; transition: transform .15s ease; }
+.overview-toggle-chevron.open { transform: rotate(180deg); }
 .modal-overview { font-size: var(--text-body-sm); letter-spacing: var(--tracking-body-sm); line-height: 1.5; color: var(--text-dim); margin-bottom: var(--space-16); } /* DESIGN.md Type Scale: dropped one step from body (17px) to body-sm (14px) */
 .modal-note {
   /* DESIGN.md has no "highlight" token; reusing the Ice elevated-wash surface instead of a color fill */
@@ -673,6 +689,56 @@ footer.note {
   outline: none;
 }
 .field input:focus, .field select:focus { border-color: var(--accent); } /* focus ring uses the accent color */
+.input-with-button {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card); /* DESIGN.md Border Radius > inputs */
+  overflow: hidden;
+}
+.input-with-button:focus-within { border-color: var(--accent); }
+.input-with-button input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  padding: var(--space-8) var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  outline: none;
+}
+.input-with-button button {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  border: none;
+  border-left: 1px solid var(--border);
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+}
+.input-with-button button svg { width: 16px; height: 16px; }
+.input-with-button button:hover { color: var(--text); }
+.unselect-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-pill); /* DESIGN.md Border Radius > buttons */
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+}
+.unselect-btn:hover { color: var(--text); }
 /* Filled pill button: gold accent fill, dark text (--on-accent) since the fill is light */
 .btn {
   font-family: var(--font-body);
@@ -738,7 +804,7 @@ footer.note {
   max-width: 380px;
   width: 100%;
 }
-.confirm-box p { margin: 0 0 var(--space-16); font-size: var(--text-body-sm); color: var(--text); line-height: 1.6; }
+.confirm-box p { margin: 0 0 var(--space-16); font-size: var(--text-body-sm); color: var(--text); line-height: 1.6; white-space: pre-line; }
 .confirm-actions { display: flex; justify-content: flex-end; gap: var(--space-8); }
 
 /* ---------- Back to top ---------- */
