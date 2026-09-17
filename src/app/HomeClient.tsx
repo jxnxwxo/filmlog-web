@@ -740,10 +740,10 @@ function MovieModal({
                 />
               </div>
               <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-                <button className="btn" type="button" onClick={saveEdit} disabled={saving}>
+                <button className="btn small" type="button" onClick={saveEdit} disabled={saving}>
                   {saving ? "저장 중…" : "저장"}
                 </button>
-                <button className="btn danger" type="button" onClick={() => setConfirmDelete(true)} disabled={deleting}>
+                <button className="btn danger small" type="button" onClick={() => setConfirmDelete(true)} disabled={deleting}>
                   {deleting ? "삭제 중…" : "삭제"}
                 </button>
               </div>
