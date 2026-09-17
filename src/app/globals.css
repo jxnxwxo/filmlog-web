@@ -221,6 +221,9 @@ body {
 .segmented button.active { background: var(--accent); color: var(--on-accent); }
 .segmented button .n { opacity: .65; font-weight: 400; font-size: var(--text-caption); margin-left: var(--space-4); }
 
+/* Admin add/edit switcher: full-width track, buttons stretch evenly instead of content-sizing */
+.admin-tabs button { flex: 1 1 0; text-align: center; }
+
 .lang-segmented button { padding: var(--space-8) var(--space-12); font-size: 16px; line-height: 1; }
 
 /* Karaoke-machine style: a compact title/cast scope toggle folded into the search box itself */

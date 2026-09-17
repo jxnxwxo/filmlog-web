@@ -112,7 +112,7 @@ function AdminTabs() {
   const [tab, setTab] = useState<"add" | "edit">("add");
   return (
     <>
-      <div className="segmented" style={{ width: "100%", marginBottom: 20 }}>
+      <div className="segmented admin-tabs" style={{ width: "100%", marginBottom: 20 }}>
         <button className={tab === "add" ? "active" : ""} onClick={() => setTab("add")} type="button">
           새 작품 추가
         </button>
@@ -338,7 +338,7 @@ function AddMovieForm() {
               maxLength={200}
             />
           </div>
-          <button className="btn" type="submit" disabled={submitting}>
+          <button className="btn small" type="submit" disabled={submitting}>
             {submitting ? "추가 중…" : "추가"}
           </button>
         </form>
