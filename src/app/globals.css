@@ -545,6 +545,41 @@ footer.note {
 .modal-title { font-family: var(--font-display); font-weight: 600; font-size: var(--text-subheading); letter-spacing: var(--tracking-subheading); margin: 0 0 var(--space-4); text-wrap: balance; }
 .modal-sub { color: var(--text-faint); font-size: var(--text-caption); font-style: italic; margin-bottom: var(--space-8); }
 .modal-meta { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-12); font-family: var(--font-body); font-size: var(--text-caption); color: var(--text-dim); }
+.collection-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding: var(--space-4) var(--space-8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  color: var(--accent-text);
+  cursor: pointer;
+}
+.collection-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  padding: var(--space-8) var(--space-12);
+  margin-bottom: var(--space-16);
+}
+.collection-item {
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--space-4) 0;
+  font: inherit;
+  font-size: var(--text-body-sm);
+  color: var(--text);
+  cursor: pointer;
+}
+.collection-item:hover { color: var(--accent-text); }
 .rating-row { display: flex; gap: var(--space-16); margin-bottom: var(--space-16); }
 .rating-box { background: var(--surface-2); border-radius: var(--radius-card); padding: var(--space-8) var(--space-12); }
 .rating-box .label { font-family: var(--font-body); font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }

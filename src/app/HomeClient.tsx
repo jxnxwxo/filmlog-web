@@ -614,6 +614,7 @@ function MovieModal({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showOverview, setShowOverview] = useState(false);
+  const [showCollection, setShowCollection] = useState(false);
 
   async function saveEdit() {
     setSaving(true);
@@ -682,8 +683,29 @@ function MovieModal({
               <h2 className="modal-title">{title}</h2>
               {showSub && <div className="modal-sub">{item.titleKr}</div>}
               <div className="modal-meta">{[item.year, getCountry(item, lang)].filter(Boolean).join(" · ")}</div>
+              {collectionMates.length > 0 && (
+                <button
+                  type="button"
+                  className="collection-toggle"
+                  onClick={() => setShowCollection((v) => !v)}
+                >
+                  {getCollectionName(item, lang) || t.collectionLabel}
+                  <span className={"overview-toggle-chevron" + (showCollection ? " open" : "")}>
+                    <ChevronIcon />
+                  </span>
+                </button>
+              )}
             </div>
           </div>
+          {showCollection && collectionMates.length > 0 && (
+            <div className="collection-list">
+              {collectionMates.map((m) => (
+                <button key={m.id} type="button" className="collection-item" onClick={() => onSelectMovie(m)}>
+                  {getTitle(m, lang)}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="rating-row">
             <div className="rating-box mine">
               <div className="label">{t.myRating}</div>
@@ -735,22 +757,6 @@ function MovieModal({
             )}
           </div>
           <p className="person-note">{t.personFilterNote}</p>
-
-          {collectionMates.length > 0 && (
-            <div className="modal-cast">
-              <span className="label">{getCollectionName(item, lang) || t.collectionLabel}</span>
-              <span className="person-list">
-                {collectionMates.map((m, i) => (
-                  <span key={m.id}>
-                    <button type="button" className="person-tag" onClick={() => onSelectMovie(m)}>
-                      {getTitle(m, lang)}
-                    </button>
-                    {i < collectionMates.length - 1 ? ", " : ""}
-                  </span>
-                ))}
-              </span>
-            </div>
-          )}
 
           {isAdmin && (
             <div className="modal-admin">
