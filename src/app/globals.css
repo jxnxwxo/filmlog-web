@@ -626,7 +626,8 @@ footer.note {
   cursor: pointer;
 }
 .person-tag:hover { text-decoration: underline; }
-.person-note { margin: var(--space-8) 0 0; font-size: var(--text-caption); color: var(--text-faint); }
+.person-note { margin: var(--space-4) 0 var(--space-16); font-size: var(--text-caption); color: var(--text-faint); }
+.person-note::before { content: "*  "; }
 .modal-admin {
   margin-top: var(--space-16);
   padding-top: var(--space-16);
