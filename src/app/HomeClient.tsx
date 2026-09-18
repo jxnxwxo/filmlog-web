@@ -13,6 +13,7 @@ import {
   getCountry,
   getCasting,
   getDirector,
+  getCollectionName,
   getTopCast,
   posterUrl,
 } from "@/lib/i18n";
@@ -484,11 +485,13 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
       {selected && (
         <MovieModal
           item={selected}
+          allItems={items}
           lang={lang}
           t={t}
           isAdmin={isAdminView}
           onClose={() => setSelected(null)}
           onSelectPerson={filterByPerson}
+          onSelectMovie={(m) => setSelected(m)}
           onChanged={async () => {
             await refreshMovies();
           }}
@@ -578,21 +581,28 @@ function PersonTags({ names, onSelect }: { names: string; onSelect: (name: strin
 
 function MovieModal({
   item,
+  allItems,
   lang,
   t,
   isAdmin,
   onClose,
   onSelectPerson,
+  onSelectMovie,
   onChanged,
 }: {
   item: Movie;
+  allItems: Movie[];
   lang: Lang;
   t: (typeof I18N)["ko"];
   isAdmin: boolean;
   onClose: () => void;
   onSelectPerson: (name: string) => void;
+  onSelectMovie: (item: Movie) => void;
   onChanged: () => Promise<void>;
 }) {
+  const collectionMates = item.collectionId
+    ? allItems.filter((m) => m.collectionId === item.collectionId && m.id !== item.id)
+    : [];
   const title = getTitle(item, lang);
   const showSub = item.titleKr && title !== item.titleKr;
   const src = posterUrl(item.posterKey?.[lang] || item.posterKey?.ko, "w185");
@@ -725,6 +735,22 @@ function MovieModal({
             )}
           </div>
           <p className="person-note">{t.personFilterNote}</p>
+
+          {collectionMates.length > 0 && (
+            <div className="modal-cast">
+              <span className="label">{getCollectionName(item, lang) || t.collectionLabel}</span>
+              <span className="person-list">
+                {collectionMates.map((m, i) => (
+                  <span key={m.id}>
+                    <button type="button" className="person-tag" onClick={() => onSelectMovie(m)}>
+                      {getTitle(m, lang)}
+                    </button>
+                    {i < collectionMates.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </span>
+            </div>
+          )}
 
           {isAdmin && (
             <div className="modal-admin">

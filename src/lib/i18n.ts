@@ -47,6 +47,7 @@ export interface I18nStrings {
   exportCsv: string;
   showOverview: string;
   hideOverview: string;
+  collectionLabel: string;
 }
 
 export const I18N: Record<Lang, I18nStrings> = {
@@ -95,6 +96,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     exportCsv: "CSV 내보내기",
     showOverview: "줄거리 보기",
     hideOverview: "줄거리 닫기",
+    collectionLabel: "시리즈",
   },
   en: {
     siteTitle: "FILM & DRAMA ARCHIVE",
@@ -141,6 +143,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     exportCsv: "Export CSV",
     showOverview: "Show synopsis",
     hideOverview: "Hide synopsis",
+    collectionLabel: "Collection",
   },
   ja: {
     siteTitle: "FILM & DRAMA ARCHIVE",
@@ -187,6 +190,7 @@ export const I18N: Record<Lang, I18nStrings> = {
     exportCsv: "CSVエクスポート",
     showOverview: "あらすじを見る",
     hideOverview: "あらすじを閉じる",
+    collectionLabel: "シリーズ",
   },
 };
 
@@ -201,6 +205,8 @@ export interface Movie {
   grade: number | string | null;
   casting: { ko: string; en: string; ja: string };
   director: { ko: string; en: string; ja: string };
+  collectionId: number | null;
+  collection: { ko: string; en: string; ja: string };
   castSearch: string;
   overview: { ko: string; en: string; ja: string };
   voteAverage: number | string | null;
@@ -230,6 +236,9 @@ export function getCasting(item: Movie, lang: Lang): string {
 }
 export function getDirector(item: Movie, lang: Lang): string {
   return item.director?.[lang] || "";
+}
+export function getCollectionName(item: Movie, lang: Lang): string {
+  return item.collection?.[lang] || "";
 }
 export function getTopCast(item: Movie, lang: Lang, n: number = 2): string {
   const full = getCasting(item, lang);

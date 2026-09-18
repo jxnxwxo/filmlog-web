@@ -31,6 +31,10 @@ interface TmdbCrewMember {
 interface TmdbCreator {
   name: string;
 }
+interface TmdbCollection {
+  id: number;
+  name: string;
+}
 interface TmdbDetails {
   title?: string;
   name?: string;
@@ -43,6 +47,7 @@ interface TmdbDetails {
   production_countries?: TmdbCountry[];
   origin_country?: string[];
   created_by?: TmdbCreator[];
+  belongs_to_collection?: TmdbCollection | null;
 }
 interface TmdbSearchResult {
   id: number;
@@ -154,6 +159,8 @@ export interface FullMovieData {
   director: { ko: string; en: string; ja: string };
   voteAverage: number | null;
   posterKey: { ko: string | null; en: string | null; ja: string | null };
+  collectionId: number | null;
+  collectionName: { ko: string; en: string; ja: string };
 }
 
 export async function fetchFullMovieData(
@@ -229,6 +236,13 @@ export async function fetchFullMovieData(
       ko: ko.poster_path ?? null,
       en: en.poster_path ?? ko.poster_path ?? null,
       ja: ja.poster_path ?? ko.poster_path ?? null,
+    },
+    // TV series have no belongs_to_collection field on TMDb.
+    collectionId: ko.belongs_to_collection?.id ?? en.belongs_to_collection?.id ?? null,
+    collectionName: {
+      ko: ko.belongs_to_collection?.name || en.belongs_to_collection?.name || "",
+      en: en.belongs_to_collection?.name || ko.belongs_to_collection?.name || "",
+      ja: ja.belongs_to_collection?.name || en.belongs_to_collection?.name || "",
     },
   };
 }
