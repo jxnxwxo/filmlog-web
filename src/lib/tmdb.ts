@@ -22,13 +22,16 @@ interface TmdbCountry {
   name?: string;
 }
 interface TmdbCastMember {
+  id: number;
   name: string;
 }
 interface TmdbCrewMember {
+  id: number;
   name: string;
   job?: string;
 }
 interface TmdbCreator {
+  id: number;
   name: string;
 }
 interface TmdbCollection {
@@ -128,11 +131,16 @@ async function getDetails(id: number, mediaType: MediaType, lang: string): Promi
   return res.json();
 }
 
+interface NamedPerson {
+  id: number;
+  name: string;
+}
+
 async function getCredits(
   id: number,
   mediaType: MediaType,
   lang: string
-): Promise<{ cast: string[]; directors: string[] }> {
+): Promise<{ cast: NamedPerson[]; directors: NamedPerson[] }> {
   const url = `${BASE}/${mediaType}/${id}/credits?api_key=${API_KEY}&language=${lang}`;
   const res = await fetch(url);
   if (!res.ok) return { cast: [], directors: [] };
@@ -140,9 +148,22 @@ async function getCredits(
   const cast = (data.cast || []) as TmdbCastMember[];
   const crew = (data.crew || []) as TmdbCrewMember[];
   return {
-    cast: cast.slice(0, 6).map((c) => c.name),
-    directors: crew.filter((c) => c.job === "Director").map((c) => c.name),
+    cast: cast.slice(0, 6).map((c) => ({ id: c.id, name: c.name })),
+    directors: crew.filter((c) => c.job === "Director").map((c) => ({ id: c.id, name: c.name })),
   };
+}
+
+// TMDb only translates a person's name when a localized entry exists for them; otherwise
+// a ko-KR request still returns their raw (often Chinese) name. Detect that case — Han
+// characters with no Hangul — and swap in the en-US name, which TMDb reliably romanizes.
+const HANGUL_RE = /[가-힣]/;
+const HAN_RE = /[一-鿿]/;
+function isUntranslatedHanName(name: string): boolean {
+  return HAN_RE.test(name) && !HANGUL_RE.test(name);
+}
+function localizeKoNames(koList: NamedPerson[], enList: NamedPerson[]): string[] {
+  const enById = new Map(enList.map((p) => [p.id, p.name]));
+  return koList.map((p) => (isUntranslatedHanName(p.name) && enById.get(p.id)) || p.name);
 }
 
 export interface FullMovieData {
@@ -190,22 +211,25 @@ export async function fetchFullMovieData(
   const rawCountry = countriesOf(ko)[0] || countriesOf(en)[0] || "";
   const country = normalizeCountry(rawCountry);
 
-  const castKo = credKo.cast.join(", ");
-  const castEn = credEn.cast.join(", ");
-  const castJa = credJa.cast.join(", ");
+  const castKo = localizeKoNames(credKo.cast, credEn.cast).join(", ");
+  const castEn = credEn.cast.map((c) => c.name).join(", ");
+  const castJa = credJa.cast.map((c) => c.name).join(", ");
 
   // TMDb rarely lists a "Director" crew credit for TV series (it's a per-episode
   // credit there), so fall back to created_by (the show's credited creator(s)).
-  const directorsOf = (cred: { directors: string[] }, d: TmdbDetails): string => {
-    if (cred.directors.length > 0) return cred.directors.join(", ");
+  const directorsOf = (cred: { directors: NamedPerson[] }, d: TmdbDetails): NamedPerson[] => {
+    if (cred.directors.length > 0) return cred.directors;
     if (mediaType === "tv" && d.created_by && d.created_by.length > 0) {
-      return d.created_by.map((c) => c.name).join(", ");
+      return d.created_by.map((c) => ({ id: c.id, name: c.name }));
     }
-    return "";
+    return [];
   };
-  const directorKo = directorsOf(credKo, ko);
-  const directorEn = directorsOf(credEn, en);
-  const directorJa = directorsOf(credJa, ja);
+  const directorKoList = directorsOf(credKo, ko);
+  const directorEnList = directorsOf(credEn, en);
+  const directorJaList = directorsOf(credJa, ja);
+  const directorKo = localizeKoNames(directorKoList, directorEnList).join(", ");
+  const directorEn = directorEnList.map((c) => c.name).join(", ");
+  const directorJa = directorJaList.map((c) => c.name).join(", ");
 
   return {
     tmdbId: id,
