@@ -652,9 +652,16 @@ footer.note {
   .modal-thumb { width: 68px; aspect-ratio: auto; }
   .modal-head-info { padding-top: 0; }
   .modal-cat { margin-bottom: var(--space-4); }
-  /* A 2-line wrap was the main reason the text column outgrew the poster; a single
-     truncated line keeps the header compact and close to the poster's own height. */
-  .modal-title { font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* Capping at 2 lines (instead of cutting to 1) keeps long titles readable while still
+     bounding how far the text column can outgrow the poster. */
+  .modal-title {
+    font-size: 19px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .collection-toggle { margin-top: var(--space-4); padding: 3px var(--space-8); }
 
   /* Shrink the hero so it doesn't push the movie list below the fold on a phone */
