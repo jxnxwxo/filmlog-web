@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   I18N,
@@ -96,6 +96,17 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
   const [isAdminView, setIsAdminView] = useState(false);
   const [showTop, setShowTop] = useState(false);
   const [ratingFilter, setRatingFilter] = useState<Set<number>>(new Set());
+  const [searchFocused, setSearchFocused] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Scrolling here (rather than inline in onFocus) waits for the hero-collapse re-render
+  // to land first, so the scroll math uses the post-collapse layout instead of overshooting
+  // past the input by however tall the hero used to be.
+  useEffect(() => {
+    if (searchFocused) {
+      searchInputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [searchFocused]);
   const [ratingPickerOpen, setRatingPickerOpen] = useState(false);
   const [sortPickerOpen, setSortPickerOpen] = useState(false);
 
@@ -246,10 +257,11 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
 
   const countMovie = items.filter((d) => d.category === "movie").length;
   const countDrama = items.filter((d) => d.category === "drama").length;
+  const searchActive = searchFocused || query.trim() !== "";
 
   return (
     <>
-      <div className="hero">
+      <div className={"hero" + (searchActive ? " hero-collapsed" : "")}>
         <div>
           <h1 onClick={goHome} role="button" tabIndex={0} title={t.siteTitle}>
             {t.siteTitle}
@@ -337,9 +349,11 @@ export default function HomeClient({ initialItems }: { initialItems: Movie[] }) 
             <input
               type="text"
               placeholder={searchScope === "cast" ? t.searchPlaceholderCast : t.searchPlaceholderTitle}
+              ref={searchInputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              onFocus={(e) => e.currentTarget.scrollIntoView({ behavior: "smooth", block: "start" })}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
             />
           </div>
           <div className="filter-dropdown sort-filter">
