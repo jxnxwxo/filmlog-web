@@ -648,14 +648,14 @@ footer.note {
      the poster's 2:3 box. Tightening the title/badge/chip sizing keeps that column close
      to the poster's natural height so the stretch below only has to close a small gap
      instead of skewing the poster's proportions. */
-  .modal-head { align-items: stretch; }
+  .modal-head { align-items: stretch; gap: var(--space-12); padding-right: 16px; }
   .modal-thumb { width: 68px; aspect-ratio: auto; }
   .modal-head-info { padding-top: 0; }
   .modal-cat { margin-bottom: var(--space-4); }
   /* Capping at 2 lines (instead of cutting to 1) keeps long titles readable while still
      bounding how far the text column can outgrow the poster. */
   .modal-title {
-    font-size: 19px;
+    font-size: 17px;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
