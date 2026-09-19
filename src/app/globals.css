@@ -661,6 +661,10 @@ footer.note {
     -webkit-line-clamp: 2;
     overflow: hidden;
     text-overflow: ellipsis;
+    /* Default CJK line-breaking allows a break between any two characters, which splits
+       words like "칼날" into "칼"/"날" mid-word; keep-all only breaks at spaces instead. */
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
   .collection-toggle { margin-top: var(--space-4); padding: 3px var(--space-8); }
 
